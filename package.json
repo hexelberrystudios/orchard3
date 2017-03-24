@@ -1,0 +1,24 @@
+{
+  "name": "hexelberry-orchard",
+  "version": "0.0.0",
+  "description": "An organization tool",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexelberrystudios/orchard3.git"
+  },
+  "keywords": [],
+  "author": "Hexelberry Studios <hexelberrystudios@gmail.com>",
+  "license": "GNU-3.0",
+  "bugs": {
+    "url": "https://github.com/hexelberrystudios/orchard3/issues"
+  },
+  "homepage": "https://github.com/hexelberrystudios/orchard3#readme",
+  "scripts": {
+    "start": "node server"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "serve-static": "^1.12.1"
+  }
+}
