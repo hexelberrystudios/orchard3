@@ -1,0 +1,361 @@
+:root {
+  /* Colors */
+  --dark-color: #4b255e;
+  --med-color: #70285f;
+  --black-color: #555;
+  --gray-color: #d4c4d0;
+  --light-color: #fbf8fa;
+  --v-light-color: #fff;
+  --gray-color-shadow: rgba(191, 168, 185, 0.25);
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 
+    "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", 
+    "Fira Sans", "Droid Sans", "Helvetica Neue", 
+    sans-serif;
+  line-height: 1.5;
+  background-color: var(--v-light-color);
+  color: var(--dark-color);
+}
+
+/* Forms */
+.hxb-form {
+  transform: translate(calc(50% - 15rem / 2), 0%);
+}
+
+/* Label */
+
+/* Text field, Text Area field */
+.hxb-input-field {
+  display: block;
+  font-size: 1rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border: 0.1rem solid var(--gray-color);
+  box-shadow: inset 0 0.1rem 0.1rem rgba(0, 0, 0, .075);
+  min-width: 15rem;
+  min-height: 1.25rem;
+}
+
+.hxb-fieldset {
+  width: 13.8rem;
+  border-radius: 0.25rem;
+  border: 0.1rem solid var(--dark-color);
+}
+
+/* Custom checkboxes and radio buttons made due to these observations: https://gdstechnology.blog.gov.uk/2016/12/13/improving-forms-with-new-radios-and-checkboxes/ */
+/* Checkbox */
+/* the actual checkbox */
+.hxb-checkbox {
+  float: left;
+  cursor: pointer;
+  left: 0;
+  top: 0;
+  width: 2.15rem;
+  height: 2.15rem;
+  opacity: 0;
+  margin: 0;
+}
+/* the checkbox box */
+.hxb-checkbox-label:before {
+  content: '';
+  border: 0.15rem solid;
+  background: transparent;
+  width: 2rem;
+  height: 2rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+/* the checkbox doesn't actually take up any space, so make sure to move the label over */
+.hxb-checkbox-label {
+  display: block;
+  height: 2rem;
+  position: relative;
+  padding-left: 3rem;
+  padding-top: 0.3rem;
+  cursor: pointer;
+}
+/* the checkmark (an L shape rotated a bit) */
+.hxb-checkbox-label:after {
+  content: '';
+  border: solid;
+  border-width: 0 0 0.3rem 0.3rem;
+  background: transparent;
+  width: 1rem;
+  height: 0.5rem;
+  position: absolute;
+  top: 0.6rem;
+  left: 0.5rem;
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  zoom: 1;
+  filter: alpha(opacity=0);
+  opacity: 0;
+}
+/* show the checkmark when the checkbox is checked */
+.hxb-checkbox:checked + .hxb-checkbox-label:after {
+  opacity: 1;
+}
+
+/* Radio Button */
+/* the actual radio button */
+.hxb-radio-button {
+  float: left;
+  cursor: pointer;
+  left: 0;
+  top: 0;
+  width: 2.15rem;
+  height: 2.15rem;
+  opacity: 0;
+  margin: 0;
+}
+/* the radio button circle */
+.hxb-radio-button-label:before {
+  content: '';
+  border: 0.15rem solid;
+  background: transparent;
+  width: 2rem;
+  height: 2rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+}
+/* the radio button doesn't actually take up any space, so make sure to move the label over */
+.hxb-radio-button-label {
+  display: block;
+  height: 2rem;
+  position: relative;
+  padding-left: 3rem;
+  padding-top: 0.3rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+/* the filling */
+.hxb-radio-button-label:after {
+  content: '';
+  border: 0.65rem solid;
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  zoom: 1;
+  filter: alpha(opacity=0);
+  opacity: 0;
+}
+/* show the filling when the radio button is checked */
+.hxb-radio-button:checked + .hxb-radio-button-label:after {
+  zoom: 1;
+  filter: alpha(opacity=100);
+  opacity: 1;
+}
+
+/* Dropdowns */
+.hxb-dropdown {
+  font-size: 1rem;
+  border-color: var(--gray-color);
+  background-color: var(--light-color);
+  min-width: 15.7rem;
+  height: 2rem;
+}
+
+/* Buttons */
+.hxb-button {
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 0.1rem solid var(--dark-color);
+  background-color: var(--med-color);
+  color: var(--v-light-color);
+}
+
+.hxb-button:hover,
+.hxb-button:active {
+  background-color: var(--dark-color);
+}
+
+.hxb-field-card > .hxb-remove-button {
+  float: right;
+  font-size: 1.5rem;
+  border: none;
+  background: none;
+  color: var(--med-color);
+  padding: 0 0.75rem 0 0;
+  margin: 0;
+}
+
+.hxb-add-item-button {
+  display: block;
+  font-size: 1rem;
+  box-sizing: content-box;
+}
+
+.hxb-add-item-button > .hxb-add-item-button__icon {
+  display: block;
+  width: calc(15rem + 8%);
+  font-size: 10rem;
+  color: var(--med-color);
+  font-weight: 100;
+}
+
+/* Form formatting */
+.hxb-form-field {
+  margin-bottom: 1rem;
+}
+
+/* Lists */
+/* Object list: The list that shows the user's list of bundles and items. */
+.hxb-object-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hxb-object-list-item {
+  font-size: 1.25rem;
+  background-color: var(--light-color);
+  margin: 0.5rem 0.25rem;
+  border-radius: 0.25rem;
+  border-left: 0.25rem solid var(--med-color);
+  border-top: 0.1rem solid var(--gray-color-shadow);
+  box-shadow: 0rem 0.1rem 0.1rem var(--gray-color);
+}
+
+.hxb-object-list-item__link {
+  display: block;
+  padding: 1rem 0.5rem;
+  color: var(--dark-color);
+  text-decoration: none;
+}
+
+.hxb-object-list-item__arrow {
+  float: right;
+}
+
+.hxb-object-list.is-indented > .hxb-object-list-item {
+    margin-left: 2rem;
+    width: 80%;
+}
+
+/* Choice list: Single drop down on the page? Use this instead. */
+.hxb-choice-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hxb-choice-list-item {
+  font-size: 1.25rem;
+  background-color: var(--light-color);
+  border-top: 0.1rem solid var(--gray-color);
+}
+
+.hxb-choice-list-item__link {
+  display: block;
+  padding: 1rem 0.5rem;
+  color: var(--dark-color);
+  text-decoration: none;
+}
+
+/* Links */
+a {
+  color: var(--med-color);
+}
+
+a:visited {
+  color: var(--dark-color);
+}
+
+/* Header */
+.hxb-header {
+  background-color: var(--med-color);
+  text-align: center;
+  padding: 0.25rem;
+}
+
+.hxb-header > a {
+  color: #fff;  
+}
+
+/* Footer */
+.hxb-footer {
+  background-color: var(--med-color);
+  color: #fff;
+  /* position: fixed; */
+  bottom: 0;
+  width: 100%;
+  padding: 0.25rem 0;
+}
+
+.hxb-footer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hxb-footer-list__action {
+  display: inline-block;
+  width: 24.5%;
+  text-align: center;
+  padding: 0;
+}
+
+.hxb-footer-list__action > a {
+  color: #fff;
+}
+
+/* Field Card */
+.hxb-field-card {
+  width: calc(15rem + 8%);
+  background-color: #fff;
+  margin-left: -6%;
+  padding-left: 6%;
+  padding-right: 0;
+  padding-bottom: 1rem;
+  border-radius: 0.3rem;
+  margin-bottom: 2rem;
+  box-shadow: 0.1rem 0.1rem 0.5rem var(--med-color);
+}
+
+.hxb-field-card > .hxb-form-field:nth-child(2) {
+  padding-top: 1rem;
+}
+
+/* Utilities */
+.hxb-u-display-block {
+  display: block;
+}
+
+.hxb-u-txt-center {
+  text-align: center;
+}
+
+.hxb-u-ml-05 {
+  margin-left: 0.5rem;
+}
+
+.hxb-u-pd-1 {
+  padding: 1rem;
+}
+
+.hxb-u-pdl-1 {
+  padding-left: 1rem;
+}
+
+.hxb-u-float-r {
+  float: right;
+}
