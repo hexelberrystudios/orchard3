@@ -15,7 +15,9 @@
   "homepage": "https://github.com/hexelberrystudios/orchard3#readme",
   "scripts": {
     "start": "node server",
-    "build": "rollup --config ./build/rollup.client.config.js"
+    "build:client": "rollup --config ./build/rollup.client.config.js",
+    "build:server": "rollup --config ./build/rollup.server.config.js",
+    "build": "npm run build:client && npm run build:server"
   },
   "dependencies": {
     "babel-core": "^6.24.0",

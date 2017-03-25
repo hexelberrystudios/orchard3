@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'development') {
 
 export default {
   entry: path.resolve(__dirname, '../src/server-entry.js'),
-  dest: path.resolve(__dirname, '../public/bundle.js'),
+  dest: path.resolve(__dirname, '../public/server-bundle.js'),
   sourceMap: true,
   format: 'iife',
   moduleName: 'orchard',

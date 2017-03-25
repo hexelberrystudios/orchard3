@@ -1,4 +1,4 @@
-(function () {
+var orchard = (function () {
 'use strict';
 
 /*!
@@ -12133,7 +12133,29 @@ if (typeof module !== 'undefined') {
   module.exports = app;
 }
 
-app.$mount('#app');
+var entry = function entry(context) {
+  // set router's location
+  router.push(context.url);
+  // call prefetch hooks on components matched by the route
+  var s = Date.now();
+  return Promise.all(router.getMatchedComponents().map(function (component) {
+    if (component.prefetch) {
+      return component.prefetch(store);
+    }
+  })).then(function () {
+    console.log('data pre-fetch: ' + (Date.now() - s) + 'ms');
+    // set initial store on context
+    // the request handler will inline the state in the HTML response.
+    context.initialState = store.state;
+    return app;
+  });
+};
+
+if (typeof module !== 'undefined') {
+  module.exports = entry;
+}
+
+return entry;
 
 }());
-//# sourceMappingURL=bundle.js.map
+//# sourceMappingURL=server-bundle.js.map

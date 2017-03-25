@@ -1,6 +1,6 @@
 import { app, router, store } from './app'
 
-export default context => {
+const entry = context => {
   // set router's location
   router.push(context.url)
   // call prefetch hooks on components matched by the route
@@ -17,3 +17,9 @@ export default context => {
     return app
   })
 }
+
+if (typeof module !== 'undefined') {
+  module.exports = entry;
+}
+
+export default entry

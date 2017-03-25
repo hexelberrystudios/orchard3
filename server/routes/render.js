@@ -1,48 +1,39 @@
-var renderLayout = function (renderer, html, request, reply) {
-  'use strict';
+'use strict';
+
+var renderLayout = function (renderer, html, req, res) {
+  var path = require('path');
+  var fs = require('fs');
+  var context = { url: req.url };
+  var stream;
   
   if (!renderer) {
-    return request.raw.res.end('waiting for compilation... refresh in a moment.')
+    return res.send('waiting for compilation... refresh in a moment.');
+  } else {
+    console.log(req.url.path);
+    // Render our Vue app to a stream
+    stream = renderer.renderToStream(context);
+    // Write the pre-app HTML to the response
+    res.write(html.head);
+    // Whenever new chunks are rendered...
+    stream.on('data', function (chunk) {
+      // Write the chunk to the response
+      res.write(chunk);
+    });
+    // When all chunks are rendered...
+    stream.on('end', function () {
+      // Write the post-app HTML to the response
+      res.end(html.tail);
+    });
+    // If an error occurs while rendering...
+    stream.on('error', function (error) {
+      // Log the error in the console
+      console.error(error)
+      // Tell the client something went wrong
+      return res
+        .status(500)
+        .send('Server Error')
+    });
   }
-  console.log('Rendering...');
-
-  var s = Date.now()
-  var context = { url: request.url.path }
-  
-  var renderStream = renderer.renderToStream(context)
-  var firstChunk = true
-  request.raw.res.write(html.head)
-  console.log('Wrote head');
-
-  renderStream.on('data', chunk => {
-    console.log('chunk');
-    /*
-    if (firstChunk) {
-      // embed initial store state
-      if (context.initialState) {
-        request.raw.res.write(
-          `<script>window.__INITIAL_STATE__=${
-            serialize(context.initialState, { isJSON: true })
-          }</script>`
-        )
-      }
-      firstChunk = false
-    }
-    */
-    request.raw.res.write(chunk)
-  })
-
-  renderStream.on('end', () => {
-    console.log('Finished rendering');
-    request.raw.res.end(html.tail);
-    //reply.close({ end: false });
-    console.log(`whole request: ${Date.now() - s}ms`)
-  })
-
-  renderStream.on('error', err => {
-    console.log(err);
-    throw err
-  })
 }
 
 module.exports = {

@@ -1,47 +1,35 @@
 'use strict';
 
-module.exports = function (request, response) {
-  var path = require('path');
+var init = function (app, paths) {
   var fs = require('fs');
-  // Create a renderer
-  var renderer = require('vue-server-renderer').createRenderer();
-  // Get the HTML layout
-  var layout = fs.readFileSync(path.resolve(__dirname, '../../views/index.html'), 'utf8');
-  var app = require(path.resolve(__dirname, '../../public/bundle'));
-  // Split the layout into two sections of HTML
-  var layoutSections = layout.split('<div id="app"></div>');
-  var preAppHTML = layoutSections[0];
-  var postAppHTML = layoutSections[1];
+  var path = require('path');
+  var createBundleRenderer = require('vue-server-renderer').createBundleRenderer;
+  var render = require('./render.js');
+  var bundlePath = path.resolve(__dirname, '../../public/server-bundle.js');
+  var renderer,
+    i;
 
-  renderer.renderToString(
-    // Create an app instance
-    require(path.resolve(__dirname, '../../public/bundle')),
-    // Handle the rendered result
-    function (error, html) {
-      console.log(html);
+  // parse index.html template
+  var html = (function getLayout() {
+    var template = fs.readFileSync(path.resolve(__dirname, '../../views/index.html'), 'utf-8');
+    var i = template.indexOf('{{ APP }}');
+    // @TODO: Figure out how vue-style-loader works
+    // styles are injected dynamically via vue-style-loader in development
+    //var style = isProd ? '<link rel="stylesheet" href="/dist/styles.css">' : ''
+    var style = '';
+    return {
+      head: template.slice(0, i).replace('{{ STYLE }}', style),
+      tail: template.slice(i + '{{ APP }}'.length)
     }
-  );
-  // Render our Vue app to a stream
-  var stream = renderer.renderToStream(app);
-  // Write the pre-app HTML to the response
-  response.write(preAppHTML)
-  // Whenever new chunks are rendered...
-  stream.on('data', function (chunk) {
-    // Write the chunk to the response
-    response.write(chunk)
-  })
-  // When all chunks are rendered...
-  stream.on('end', function () {
-    // Write the post-app HTML to the response
-    response.end(postAppHTML)
-  })
-  // If an error occurs while rendering...
-  stream.on('error', function (error) {
-    // Log the error in the console
-    console.error(error)
-    // Tell the client something went wrong
-    return response
-      .status(500)
-      .send('Server Error')
-  })
-};
+  })();
+
+  renderer = createBundleRenderer(fs.readFileSync(bundlePath, 'utf-8'));
+
+  for (i = 0; i < paths.length; i++) {
+    app.get(paths[i], function (req, res, next) {
+      render.renderLayout(renderer, html, req, res);
+    });
+  }
+}
+
+module.exports = init;
