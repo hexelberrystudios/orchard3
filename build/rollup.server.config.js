@@ -37,7 +37,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 export default {
-  entry: path.resolve(__dirname, '../src/client-entry.js'),
+  entry: path.resolve(__dirname, '../src/server-entry.js'),
   dest: path.resolve(__dirname, '../public/bundle.js'),
   sourceMap: true,
   format: 'iife',

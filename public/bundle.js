@@ -1,4 +1,3 @@
-(function () {
 'use strict';
 
 /*!
@@ -12053,9 +12052,16 @@ if (inBrowser$2 && window.Vue) {
 
 Vue$2$1.use(VueRouter);
 
+var base = void 0;
+if (typeof __dirname !== 'undefined') {
+  base = __dirname;
+} else {
+  base = '/';
+}
+
 var router = new VueRouter({
   mode: 'history',
-  base: __dirname,
+  base: base,
   routes: [{ path: '/app', component: LoginPage }, { path: '/app/register', component: RegisterPage }, { path: '/app/home', component: HomePage }, { path: '/app/new', component: NewPage }, { path: '/app/new-item', component: NewItemPageStep1 }, { path: '/app/new-item-page-2', component: NewItemPageStep2 }, { path: '/app/new-template', component: NewTemplatePage }, { path: '/app/edit', component: EditPage }, { path: '/app/edit-template', component: EditTemplatePageStep1 }, { path: '/app/edit-template-page-2', component: EditTemplatePageStep2 }, { path: '/app/item/:itemId', component: ItemPage }, { path: '/app/item/edit/:itemId', component: EditItemPage }, { path: '/app/todo', component: ToDoPage }, { path: '/app/style-guide', component: StyleGuide }]
 });
 
@@ -12122,7 +12128,9 @@ var app = new Vue$2$1(_extends({
   store: store
 }, App));
 
-app.$mount('#app');
+if (typeof module !== 'undefined') {
+  module.exports = app;
+}
 
-}());
-//# sourceMappingURL=build.js.map
+app.$mount('#app');
+//# sourceMappingURL=bundle.js.map

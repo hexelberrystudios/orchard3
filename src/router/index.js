@@ -17,9 +17,16 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
+let base;
+if (typeof __dirname !== 'undefined') {
+  base = __dirname;
+} else {
+  base = '/';
+}
+
 const router = new VueRouter({
   mode: 'history',
-  base: __dirname,
+  base: base,
   routes: [
     { path: '/app', component: LoginPage },
     { path: '/app/register', component: RegisterPage },

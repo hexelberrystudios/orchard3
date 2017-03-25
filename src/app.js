@@ -12,4 +12,8 @@ const app = new Vue({
   ...App
 })
 
+if (typeof module !== 'undefined') {
+  module.exports = app;
+}
+
 export { app, router, store }
