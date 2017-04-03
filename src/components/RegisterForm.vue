@@ -23,35 +23,14 @@
     },
     methods: {
       register: function (e) {
-        let self = this;
+        let self = this,
+          username = self.$store.state.form.fields.username,
+          password = self.$store.state.form.fields.password;
         e.preventDefault();
 
-        // hoodie.account is not available until hoodie.ready (a promise) is resolved.
-        hoodie.ready.then(function () {
-          hoodie.account.ready.then(function () {
-            // @TODO: Check if signing out is necessary before signing in
-            hoodie.account.signUp({
-              username: self.$store.state.form.fields.username,
-              password: self.$store.state.form.fields.password
-            }).then(function (accountProperties) {
-              // returns id, username, createdAt, updatedAt
-              console.log(accountProperties);
-              // account created! you aren't signed in yet, though
-              hoodie.account.signIn({
-                username: self.$store.state.form.fields.username,
-                password: self.$store.state.form.fields.password
-              }).then(function (sessionProperties) {
-                // returns id, username, createdAt, updatedAt,
-                // and profile properties (i.e. fullname)
-                console.log(sessionProperties);
-                // redirect to the home page when finished
-                self.$router.push('/app/home');
-              });
-            }).catch(function (err) {
-              console.log(err);
-            });
-          });
-        });
+        // @TODO: ajax call to register, where CouchDB url will be created, and the url
+        // to sync with will be returned. Prerequisite: Authorization token for signing up for premium.
+        self.$router.push('/app/home');
       }
     },
     components: {

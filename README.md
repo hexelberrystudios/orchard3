@@ -7,6 +7,17 @@ There is a client and server config, but the only difference is the entry point,
 
 vue-ssr.js and render.js handle the universal js logic to initialize Vue.js on the server, using the bundled application.
 
+Free tier features:
+- No account required.
+- Unlimited use, but data will be lost when cache is cleared
+
+Premium tier features:
+- Password protected account
+- Cloud backup
+  - backup frequency is customizable
+- Sync across devices
+- API access
+
 Technologies used:
 
 - Vue
@@ -16,6 +27,8 @@ Technologies used:
 - Rollup
 - Express
 - Node
+- PouchDB
+- CouchDB
 
 Concepts used:
 
@@ -24,3 +37,6 @@ Concepts used:
 Concepts in progress:
 
 - Store hydration
+- Service Workers
+- Offline first
+- Progressive Web App (PWA)
