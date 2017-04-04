@@ -26,6 +26,8 @@
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
     "pouchdb": "^6.1.2",
+    "pouchdb-errors": "^6.1.2",
+    "pouchdb-utils": "^6.1.2",
     "serve-static": "^1.12.1",
     "vue": "^2.2.5",
     "vue-router": "^2.3.0",

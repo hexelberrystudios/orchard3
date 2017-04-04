@@ -8,7 +8,6 @@
 </template>
 
 <script>
-  import DB from '../db.js'
   import TextField from './fields/edit/TextField.vue'
   import SubmitButton from './SubmitButton.vue'
   

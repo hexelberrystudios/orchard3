@@ -24,6 +24,7 @@
   import AddItemButton from '../AddItemButton.vue'
   import TextField from '../fields/edit/TextField.vue'
   import SubmitButton from '../SubmitButton.vue'
+  import db from '../../db/db'
   
   export default {
     name: 'new-template-page',
@@ -66,19 +67,16 @@
             }
           }
         }
-
-        hoodie.ready.then(function () {
-          if (hoodie.account.isSignedIn()) {
-            hoodie.store.add({
+        
+        let db = db.get()
+        db.pleaseAdd({
               templateName: name,
               fields: fields
-            });
-            // redirect to the home page when finished
-            self.$router.push('/app/home');
-          } else {
-            throw new Error('User is not currently signed in.');
-          }
-        });
+            }).then(function (resp) {
+              console.log(resp)
+              // redirect to the home page when finished
+              self.$router.push('/app/home')
+            })
       },
       removeField: function (fieldIndex) {
         console.log('Calling removeField in NewItemPage on index ' + fieldIndex);
