@@ -7,6 +7,8 @@ import uglify from 'rollup-plugin-uglify'
 import livereload from 'rollup-plugin-livereload'
 import serve from 'rollup-plugin-serve'
 import replace from 'rollup-plugin-replace'
+import builtins from 'rollup-plugin-node-builtins'
+import globals from 'rollup-plugin-node-globals'
 import path from 'path'
 
 const plugins = [
@@ -22,7 +24,9 @@ const plugins = [
     exclude: 'node_modules/**',
   }),
   nodeResolve({ browser: true, jsnext: true }),
-  commonjs()
+  commonjs(),
+  builtins(),
+  globals()
 ]
 
 if (process.env.NODE_ENV === 'production') {

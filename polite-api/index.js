@@ -1,12 +1,15 @@
-import add from './lib/add'
 
 /**
  * This is a thin wrapper over the PouchDB API to automatically
  * handle id and timestamps.
  */
-const pleaseInit = function () {
+const pleaseInit = function (PouchDB) {
+  console.log('db:')
+  console.log(this)
+  console.log('PouchDB:')
+  console.log(PouchDB)
   var api = {
-    pleaseAdd: add
+    
   }
   
   return api

@@ -69,6 +69,7 @@
         }
         
         let db = db.get()
+        /*
         db.pleaseAdd({
               templateName: name,
               fields: fields
@@ -77,6 +78,7 @@
               // redirect to the home page when finished
               self.$router.push('/app/home')
             })
+            */
       },
       removeField: function (fieldIndex) {
         console.log('Calling removeField in NewItemPage on index ' + fieldIndex);

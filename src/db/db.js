@@ -45,4 +45,4 @@ const remoteSync = function () {
   }
 }
 
-export { get, remoteSync }
+export default { get, remoteSync }
