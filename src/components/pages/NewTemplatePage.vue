@@ -24,7 +24,7 @@
   import AddItemButton from '../AddItemButton.vue'
   import TextField from '../fields/edit/TextField.vue'
   import SubmitButton from '../SubmitButton.vue'
-  import db from '../../db/db'
+  import DB from '../../db/db.js'
   
   export default {
     name: 'new-template-page',
@@ -68,17 +68,17 @@
           }
         }
         
-        let db = db.get()
-        /*
+        let db = DB.get()
         db.pleaseAdd({
-              templateName: name,
-              fields: fields
-            }).then(function (resp) {
-              console.log(resp)
-              // redirect to the home page when finished
-              self.$router.push('/app/home')
-            })
-            */
+            templateName: name,
+            fields: fields
+          }).then(function (resp) {
+            console.log(resp)
+            // redirect to the home page when finished
+            self.$router.push('/app/home')
+          }).catch(function (err) {
+            console.log(err)
+          })
       },
       removeField: function (fieldIndex) {
         console.log('Calling removeField in NewItemPage on index ' + fieldIndex);

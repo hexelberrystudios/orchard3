@@ -1,5 +1,5 @@
-import PouchDBErrors from 'pouchdb-errors'
-import { extend, uuid } from 'pouchdb-utils'
+import uuid from 'uuid'
+import assign from '../utils/assign'
 import addTimestamps from '../utils/add-timestamps'
 
 /**
@@ -12,11 +12,11 @@ import addTimestamps from '../utils/add-timestamps'
  */
 function addOne (db, doc, prefix) {
   if (typeof doc !== 'object') {
-    return Promise.reject(PouchDBErrors.NOT_AN_OBJECT)
+    return Promise.reject('Document must be a JSON object')
   }
 
   // copy document, to make sure we don't affect the original
-  doc = extend({}, doc)
+  doc = assign({}, doc)
 
   // generate an id if we don't already have one
   if (!doc._id) {
@@ -30,7 +30,7 @@ function addOne (db, doc, prefix) {
 
   // add createdAt/updatedAt timestamps
   doc = addTimestamps(doc)
-  return db.put()
+  return db.put(doc)
     .then(function (response) {
       // make sure to include the latest id and revision information
       doc._id = response.id

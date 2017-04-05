@@ -5,16 +5,6 @@ var global$1 = typeof global !== "undefined" ? global :
             typeof self !== "undefined" ? self :
             typeof window !== "undefined" ? window : {};
 
-/*!
- * Vue.js v2.2.6
- * (c) 2014-2017 Evan You
- * Released under the MIT License.
- */
-/*  */
-
-/**
- * Convert a value to a string that is actually rendered.
- */
 function _toString (val) {
   return val == null
     ? ''
@@ -5333,8 +5323,6 @@ var klass = {
 
 /*  */
 
-// in some cases, the event used has to be determined at runtime
-// so we used some reserved tokens during compile.
 var RANGE_TOKEN = '__r';
 var CHECKBOX_RADIO_TOKEN = '__c';
 
@@ -8035,6 +8023,32 @@ var store = new index_esm.Store({
 
 var __dirname = '/home/ubuntu/workspace/src/router';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i];
@@ -8048,15 +8062,6 @@ var _extends = Object.assign || function (target) {
 
   return target;
 };
-
-/*
- * This is a text field. It can be of type text, email, password, etc.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this text field.
- * @param {STRING} {REQUIRED} label       The label for this text field.
- * @param {STRING} {OPTIONAL} type        The type of input field this will be. (text, password, email, etc.)
- * @param {STRING} {OPTIONAL} placeholder The placeholder attribute for this text field.
- */
 
 var TextField = {
   render: function render() {
@@ -8377,11 +8382,6 @@ var DisplayTimeSinceField = {
   }
 };
 
-/**
- * This component will morph into the given field.
- * NOTE: Remember to update this component with all relevant properties from possible fields,
- * so the properties can be properly bound.
- */
 var DisplayFieldMorpher = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('Display' + _vm.field.fieldType, { tag: "component", attrs: { "value": _vm.field.value } });
@@ -8427,14 +8427,6 @@ var DisplayItem = {
     }
   }
 };
-
-/**
- * Shows a list of items and bundles for the current bundle directory.
- *
- * @TODO: Replace items with data pulled from DB.
- *
- * @param {STRING} {REQUIRED} path The bundle path to display.
- */
 
 var fetchInitialData = function fetchInitialData(store) {
   return store.dispatch('items/getItems');
@@ -8532,13 +8524,6 @@ var NewPage = {
   }
 };
 
-/*
- * This is a text field. It can be of type text, email, password, etc.
- *
- * @param {STRING} {REQUIRED} id       The id and name of this text field.
- * @param {STRING} {REQUIRED} label    The label for this text field.
- * @param {ARRAY}  {REQUIRED} options  An array containing the list of options, given in the format [{ label: 'string', value: 'string' }, ...]
- */
 var DropdownField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { directives: [{ name: "model", rawName: "v-model", value: _vm.value, expression: "value" }], staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": [function ($event) {
@@ -8693,15 +8678,6 @@ var TextAreaField = {
   }
 };
 
-/*
- * This is a date field.
- * 
- * @TODO: Add datepicker.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this date field.
- * @param {STRING} {REQUIRED} label       The label for this date field.
- */
-
 var DateField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": "date", "name": _vm.id, "placeholder": "yyyy-mm-dd" }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
@@ -8734,15 +8710,6 @@ var DateField = {
     }
   }
 };
-
-/*
- * This is a time field.
- * 
- * @TODO: Add time picker, figure out time zones.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this field.
- * @param {STRING} {REQUIRED} label       The label for this field.
- */
 
 var TimeField = {
   render: function render() {
@@ -8830,16 +8797,6 @@ var CompletableField = {
   }
 };
 
-/*
- * This is a time since field. This shows the amount of time that has elapsed
- * since the time has been reset.
- * 
- * @TODO: Add datepicker.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this date field.
- * @param {STRING} {REQUIRED} label       The label for this date field.
- */
-
 var TimeSinceField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('span', { staticClass: "hxb-u-display-block" }, [_vm._v(_vm._s(_vm.value))]), _vm._v(" "), _c('button', { staticClass: "hxb-button", attrs: { "type": "button" }, on: { "click": _vm.resetTime } }, [_vm._v("Reset")])]);
@@ -8918,11 +8875,6 @@ var TimeSinceField = {
   }
 };
 
-/**
- * This component will morph into the given field.
- * NOTE: Remember to update this component with all relevant properties from possible fields,
- * so the properties can be properly bound.
- */
 var FieldMorpher = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.field.fieldType, { tag: "component", attrs: { "id": _vm.fieldId, "label": _vm.field.fieldLabel } });
@@ -8948,9 +8900,6 @@ var FieldMorpher = {
     TimeSinceField: TimeSinceField
   }
 };
-
-// @TODO: Get this to work without javascript,
-// and get this to work with reloading the page
 
 var NewItemPageStep2 = {
   render: function render() {
@@ -9025,9 +8974,6 @@ var RemoveButton = {
   }
 };
 
-/*
- * options {ARRAY} - [{ label: 'string', value: 'string' }, ...]
- */
 var RadioButtonField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('fieldset', { staticClass: "hxb-fieldset" }, [_c('legend', [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _vm._l(_vm.options, function (option, index) {
@@ -9237,7 +9183,6 @@ function immediate(task) {
   }
 }
 
-/* istanbul ignore next */
 function INTERNAL() {}
 
 var handlers = {};
@@ -9505,9 +9450,6 @@ function argsArray(fun) {
     }
   };
 }
-
-// shim for using process in browser
-// based off https://github.com/defunctzombie/node-process/blob/master/browser.js
 
 function defaultSetTimout() {
     throw new Error('setTimeout has not been defined');
@@ -11518,11 +11460,6 @@ var sparkMd5 = createCommonjsModule(function (module, exports) {
 }));
 });
 
-/**
- * Stringify/parse functions that don't operate
- * recursively, so they avoid call stack exceeded
- * errors.
- */
 var stringify = function stringify(input) {
   var queue = [];
   queue.push({obj: input});
@@ -11695,7 +11632,6 @@ var index$5 = {
 	parse: parse$1
 };
 
-/* istanbul ignore next */
 var PouchPromise$1 = typeof Promise === 'function' ? Promise : browser$1;
 
 function isBinaryObject(object) {
@@ -23090,16 +23026,335 @@ PouchDB$5.plugin(IDBPouch)
   .plugin(mapreduce)
   .plugin(replication);
 
+// Pull from src because pouchdb-node/pouchdb-browser themselves
+// are aggressively optimized and jsnext:main would normally give us this
+// aggressive bundle.
+
+var rng;
+
+var crypto = commonjsGlobal.crypto || commonjsGlobal.msCrypto; // for IE 11
+if (crypto && crypto.getRandomValues) {
+  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+  var rnds8 = new Uint8Array(16);
+  rng = function whatwgRNG() {
+    crypto.getRandomValues(rnds8);
+    return rnds8;
+  };
+}
+
+if (!rng) {
+  // Math.random()-based (RNG)
+  //
+  // If all else fails, use Math.random().  It's fast, but is of unspecified
+  // quality.
+  var  rnds = new Array(16);
+  rng = function() {
+    for (var i = 0, r; i < 16; i++) {
+      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+    }
+
+    return rnds;
+  };
+}
+
+var rngBrowser = rng;
+
 /**
- * This is a thin wrapper over the PouchDB API to automatically
- * handle id and timestamps.
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
  */
-var pleaseInit = function pleaseInit(PouchDB) {
-  console.log('db:');
-  console.log(this);
-  console.log('PouchDB:');
-  console.log(PouchDB);
-  var api = {};
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  return  bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]];
+}
+
+var bytesToUuid_1 = bytesToUuid;
+
+var _seedBytes = rngBrowser();
+
+// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+var _nodeId = [
+  _seedBytes[0] | 0x01,
+  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+];
+
+// Per 4.2.2, randomize (14 bit) clockseq
+var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+
+// Previous uuid creation time
+var _lastMSecs = 0;
+var _lastNSecs = 0;
+
+// See https://github.com/broofa/node-uuid for API details
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || [];
+
+  options = options || {};
+
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+  // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+  // Time since last uuid creation (in msecs)
+  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+  // Per 4.2.1.2, Bump clockseq on clock regression
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  }
+
+  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  }
+
+  // Per 4.2.1.2 Throw error if too many uuids are requested
+  if (nsecs >= 10000) {
+    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq;
+
+  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+  msecs += 12219292800000;
+
+  // `time_low`
+  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff;
+
+  // `time_mid`
+  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff;
+
+  // `time_high_and_version`
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+  b[i++] = tmh >>> 16 & 0xff;
+
+  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+  b[i++] = clockseq >>> 8 | 0x80;
+
+  // `clock_seq_low`
+  b[i++] = clockseq & 0xff;
+
+  // `node`
+  var node = options.node || _nodeId;
+  for (var n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf ? buf : bytesToUuid_1(b);
+}
+
+var v1_1 = v1;
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options == 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rngBrowser)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid_1(rnds);
+}
+
+var v4_1 = v4;
+
+var uuid$1 = v4_1;
+uuid$1.v1 = v1_1;
+uuid$1.v4 = v4_1;
+
+var index$6 = uuid$1;
+
+if (typeof Object.assign !== 'function') {
+  // lite Object.assign polyfill based on
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+  Object.assign = function (target) {
+    var to = Object(target);
+
+    for (var index = 1; index < arguments.length; index++) {
+      var nextSource = arguments[index];
+
+      if (nextSource != null) {
+        // Skip over if undefined or null
+        for (var nextKey in nextSource) {
+          // Avoid bugs when hasOwnProperty is shadowed
+          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+    }
+    return to;
+  };
+}
+
+var assign$1 = Object.assign;
+
+/**
+ * Generates the current date time.
+ * 
+ * @returns The current date time as a string.
+ */
+function now() {
+  return new Date().toISOString();
+}
+
+function addTimestamps(doc) {
+  if (doc.createdAt) {
+    doc.updatedAt = now();
+  } else {
+    doc.createdAt = now();
+  }
+
+  if (doc._deleted) {
+    doc.deletedAt = doc.deletedAt || doc.updatedAt;
+  }
+
+  return doc;
+}
+
+/**
+ * Adds one object to the local database.
+ *
+ * @param  {PouchDB}  {REQUIRED} db       Reference to PouchDB
+ * @param  {Object}   {REQUIRED} doc      The object to be added to the db
+ * @param  {String}   {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
+function addOne(db, doc, prefix) {
+  if ((typeof doc === 'undefined' ? 'undefined' : _typeof(doc)) !== 'object') {
+    return Promise.reject('Document must be a JSON object');
+  }
+
+  // copy document, to make sure we don't affect the original
+  doc = assign$1({}, doc);
+
+  // generate an id if we don't already have one
+  if (!doc._id) {
+    doc._id = index$6();
+  }
+
+  // prefixes can be added to ids to significantly reduce the possibility for collision
+  if (prefix) {
+    doc._id = prefix + doc._id;
+  }
+
+  // add createdAt/updatedAt timestamps
+  doc = addTimestamps(doc);
+  return db.put(doc).then(function (response) {
+    // make sure to include the latest id and revision information
+    doc._id = response.id;
+    doc._rev = response.rev;
+    return doc;
+  }).catch(function (error) {
+    var conflict = void 0;
+
+    if (error.status === 409) {
+      conflict = new Error('Object with id "' + doc._id + '" already exists');
+      conflict.name = 'Conflict';
+      conflict.status = 409;
+
+      throw conflict;
+    } else {
+      throw error;
+    }
+  });
+}
+
+function addMany(db, docs, prefix) {
+  // copy over the objects to be added and add timestamps to them
+  docs = docs.map(function (doc) {
+    doc = assign$1({}, doc);
+    return addTimestamps(doc);
+  });
+
+  if (prefix) {
+    docs.forEach(function (doc) {
+      doc._id = prefix + (doc._id || index$6());
+    });
+  }
+
+  // make sure we make a bulk call to CouchDB for performance
+  return db.bulkDocs(docs).then(function (responses) {
+    // check through all the responses
+    return responses.map(function (response, i) {
+      var conflict = void 0;
+      // found an error/conflict. note it and move on.
+      if (response instanceof Error) {
+        if (response.status === 409) {
+          conflict = new Error('Object with id "' + docs[i]._id + '" already exists');
+          conflict.name = 'Conflict';
+          conflict.status = 409;
+
+          return conflict;
+        } else {
+          return response;
+        }
+      }
+
+      // make sure to include the latest id and revision information
+      docs[i]._id = response.id;
+      docs[i]._rev = response.rev;
+      return docs[i];
+    });
+  });
+}
+
+function add$1$1(objects, prefix) {
+  var db = this;
+
+  return Array.isArray(objects) ? addMany(db, objects, prefix) : addOne(db, objects, prefix);
+}
+
+var pleaseInit = function pleaseInit() {
+  var api = {
+    pleaseAdd: add$1$1
+  };
 
   return api;
 };
@@ -23119,7 +23374,51 @@ if (typeof window !== 'undefined' && window.PouchDB) {
   window.PouchDB.plugin(exports);
 }
 
-PouchDB$5.plugin(pleaseInit);
+var db = void 0;
+var remoteDB = void 0;
+
+var lib = {
+  /**
+   * PouchDB singleton.
+   * Get and/or instantiate PouchDB instance.
+   * If dbName is defined, a remote PouchDB instance will be created.
+   * 
+   * @param dbName [STRING] [OPTIONAL] The remote db to sync with.
+   * 
+   * @returns The local PouchDB instance on the client, null on the server.
+   */
+  get: function get(dbName) {
+    if (typeof module === 'undefined') {
+      if (!db) {
+        PouchDB$5.plugin(pleaseInit());
+
+        db = new PouchDB$5('local_db');
+      }
+
+      if (dbName) {
+        // REQUIREMENT: We must be logged in in order for this to work
+        remoteDB = new PouchDB$5(dbName);
+        // if we wanted to maintain a live connection with the remote db, we could do the following:
+        // db.sync(remoteDB, {live: true, retry: true}).on('error', console.log.bind(console));
+        // some CouchDB providers do not support this though, and it can be expensive, so let's not for now.
+      }
+
+      return db;
+    } else {
+      // @TODO: Figure out server side response
+      return null;
+    }
+  },
+
+  /**
+   * Sync the local and remote DB, if available.
+   */
+  remoteSync: function remoteSync() {
+    if (db && remoteDB) {
+      db.sync(remoteDB);
+    }
+  }
+};
 
 var NewTemplatePage = {
   render: function render() {
@@ -23168,17 +23467,17 @@ var NewTemplatePage = {
         }
       }
 
-      var db = db.get();
-      /*
+      var db = lib.get();
       db.pleaseAdd({
-            templateName: name,
-            fields: fields
-          }).then(function (resp) {
-            console.log(resp)
-            // redirect to the home page when finished
-            self.$router.push('/app/home')
-          })
-          */
+        templateName: name,
+        fields: fields
+      }).then(function (resp) {
+        console.log(resp);
+        // redirect to the home page when finished
+        self.$router.push('/app/home');
+      }).catch(function (err) {
+        console.log(err);
+      });
     },
     removeField: function removeField(fieldIndex) {
       console.log('Calling removeField in NewItemPage on index ' + fieldIndex);
@@ -24378,7 +24677,7 @@ var isarray = index$1$2;
 /**
  * Expose `pathToRegexp`.
  */
-var index$6 = pathToRegexp;
+var index$7 = pathToRegexp;
 var parse_1 = parse$2;
 var compile_1 = compile;
 var tokensToFunction_1 = tokensToFunction;
@@ -24800,10 +25099,10 @@ function pathToRegexp (path, keys, options) {
   return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
 
-index$6.parse = parse_1;
-index$6.compile = compile_1;
-index$6.tokensToFunction = tokensToFunction_1;
-index$6.tokensToRegExp = tokensToRegExp_1;
+index$7.parse = parse_1;
+index$7.compile = compile_1;
+index$7.tokensToFunction = tokensToFunction_1;
+index$7.tokensToRegExp = tokensToRegExp_1;
 
 /*  */
 
@@ -24818,7 +25117,7 @@ function getRouteRegex (path) {
     regexp = hit.regexp;
   } else {
     keys = [];
-    regexp = index$6(path, keys);
+    regexp = index$7(path, keys);
     regexpCache[path] = { keys: keys, regexp: regexp };
   }
 
@@ -24835,7 +25134,7 @@ function fillParams (
   try {
     var filler =
       regexpCompileCache[path] ||
-      (regexpCompileCache[path] = index$6.compile(path));
+      (regexpCompileCache[path] = index$7.compile(path));
     return filler(params || {}, { pretty: true })
   } catch (e) {
     {
@@ -24860,9 +25159,9 @@ function normalizeLocation (
 
   // relative params
   if (!next.path && next.params && current) {
-    next = assign$1({}, next);
+    next = assign$2({}, next);
     next._normalized = true;
-    var params = assign$1(assign$1({}, current.params), next.params);
+    var params = assign$2(assign$2({}, current.params), next.params);
     if (current.name) {
       next.name = current.name;
       next.params = params;
@@ -24894,7 +25193,7 @@ function normalizeLocation (
   }
 }
 
-function assign$1 (a, b) {
+function assign$2 (a, b) {
   for (var key in b) {
     a[key] = b[key];
   }

@@ -9,7 +9,9 @@ import addMany from './helpers/add-many'
  * @param  {String}       {OPTIONAL} prefix   optional id prefix
  * @return {Promise}
  */
-function add (db, objects, prefix) {
+function add (objects, prefix) {
+  const db = this
+  
   return Array.isArray(objects)
     ? addMany(db, objects, prefix)
     : addOne(db, objects, prefix)

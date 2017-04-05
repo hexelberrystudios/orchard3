@@ -26,6 +26,7 @@ const itemModule = {
     getItems: ({ commit, state }) => {
       const findAllItems = function (resolve, reject) {
         // look through the DB for all the items
+        /*
         hoodie.store.findAll()
           .then((docs) => {
             console.log(docs)
@@ -42,13 +43,15 @@ const itemModule = {
             console.log(error)
             reject(error)
           })
+        */
       }
               
-      return utils.runHoodieFn(commit, state, findAllItems)
+      return null
     },
     getItem: ({ commit, state }, id) => {
       const findItem = function (resolve, reject) {
         // look through the DB for all the items
+        /*
         hoodie.store.find(id)
           .then((itemDoc) => {
             // update the store with the list of available items
@@ -59,13 +62,15 @@ const itemModule = {
             console.log(error)
             reject(error)
           })
+        */
       }
       
-      return utils.runHoodieFn(commit, state, findItem)
+      return null
     },
     getToDoItems: ({ commit, state }) => {
       const findAllToDoItems = function (resolve, reject) {
         // look through the DB for all the items
+        /*
         hoodie.store.findAll()
           .then((docs) => {
             console.log(docs)
@@ -158,9 +163,10 @@ const itemModule = {
             console.log(error)
             reject(error)
           })
+          */
       }
-              
-      return utils.runHoodieFn(commit, state, findAllToDoItems)
+      
+      return null
     },
     setItem: ({ commit, state }, item) => {
       commit('ACTIVE_ITEM', item)

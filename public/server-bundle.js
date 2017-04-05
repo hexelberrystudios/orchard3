@@ -23094,12 +23094,13 @@ PouchDB$5.plugin(IDBPouch)
  * This is a thin wrapper over the PouchDB API to automatically
  * handle id and timestamps.
  */
-var pleaseInit = function pleaseInit(PouchDB) {
-  console.log('db:');
-  console.log(this);
-  console.log('PouchDB:');
-  console.log(PouchDB);
-  var api = {};
+var pleaseInit$1 = function pleaseInit() {
+  var api = {
+    pleaseTest: function pleaseTest() {
+      console.log('db:');
+      console.log(this);
+    }
+  };
 
   return api;
 };
@@ -23119,7 +23120,7 @@ if (typeof window !== 'undefined' && window.PouchDB) {
   window.PouchDB.plugin(exports);
 }
 
-PouchDB$5.plugin(pleaseInit);
+PouchDB$5.plugin(pleaseInit$1());
 
 var NewTemplatePage = {
   render: function render() {

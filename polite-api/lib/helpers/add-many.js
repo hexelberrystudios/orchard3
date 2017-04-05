@@ -1,5 +1,5 @@
-import PouchDBErrors from 'pouchdb-errors'
-import { extend, uuid } from 'pouchdb-utils'
+import uuid from 'uuid'
+import assign from '../utils/assign'
 import addTimestamps from '../utils/add-timestamps'
 
 /**
@@ -13,7 +13,7 @@ import addTimestamps from '../utils/add-timestamps'
 function addMany (db, docs, prefix) {
   // copy over the objects to be added and add timestamps to them
   docs = docs.map(function (doc) {
-    doc = extend({}, doc)
+    doc = assign({}, doc)
     return addTimestamps(doc)
   })
 
