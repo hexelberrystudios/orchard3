@@ -1,5 +1,3 @@
-import utils from '../utils.js'
-
 const itemModule = {
   // namespace this module so that it doesn't collide with other store behavior
   namespaced: true, // -> getters['items/*']

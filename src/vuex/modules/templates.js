@@ -1,5 +1,3 @@
-import utils from '../utils.js'
-
 const templateModule = {
   // namespace this module so that it doesn't collide with other store behavior
   namespaced: true, // -> getters['templates/*']

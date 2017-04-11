@@ -5,6 +5,16 @@ var global$1 = typeof global !== "undefined" ? global :
             typeof self !== "undefined" ? self :
             typeof window !== "undefined" ? window : {};
 
+/*!
+ * Vue.js v2.2.5
+ * (c) 2014-2017 Evan You
+ * Released under the MIT License.
+ */
+/*  */
+
+/**
+ * Convert a value to a string that is actually rendered.
+ */
 function _toString (val) {
   return val == null
     ? ''
@@ -2082,9 +2092,6 @@ function lifecycleMixin (Vue) {
     }
     // call the last hook...
     vm._isDestroyed = true;
-    // invoke destroy hooks on current rendered tree
-    vm.__patch__(vm._vnode, null);
-    // fire destroyed hook
     callHook(vm, 'destroyed');
     // turn off all instance listeners.
     vm.$off();
@@ -2092,8 +2099,8 @@ function lifecycleMixin (Vue) {
     if (vm.$el) {
       vm.$el.__vue__ = null;
     }
-    // remove reference to DOM nodes (prevents leak)
-    vm.$options._parentElm = vm.$options._refElm = null;
+    // invoke destroy hooks on current rendered tree
+    vm.__patch__(vm._vnode, null);
   };
 }
 
@@ -2754,15 +2761,6 @@ function initComputed (vm, computed) {
   for (var key in computed) {
     var userDef = computed[key];
     var getter = typeof userDef === 'function' ? userDef : userDef.get;
-    {
-      if (getter === undefined) {
-        warn(
-          ("No getter function has been defined for computed property \"" + key + "\"."),
-          vm
-        );
-        getter = noop;
-      }
-    }
     // create internal watcher for the computed property.
     watchers[key] = new Watcher(vm, getter, noop, computedWatcherOptions);
 
@@ -3175,7 +3173,7 @@ function extractProps (data, Ctor, tag) {
         ) {
           tip(
             "Prop \"" + keyInLowerCase + "\" is passed to component " +
-            (formatComponentName(tag || Ctor)) + ", but the declared prop name is" +
+            (formatComponentName(tag || Ctor)) + ", but the delared prop name is" +
             " \"" + key + "\". " +
             "Note that HTML attributes are case-insensitive and camelCased " +
             "props need to use their kebab-case equivalents when using in-DOM " +
@@ -4154,7 +4152,7 @@ Object.defineProperty(Vue$2$1.prototype, '$isServer', {
   get: isServerRendering
 });
 
-Vue$2$1.version = '2.2.6';
+Vue$2$1.version = '2.2.5';
 
 /*  */
 
@@ -5323,6 +5321,8 @@ var klass = {
 
 /*  */
 
+// in some cases, the event used has to be determined at runtime
+// so we used some reserved tokens during compile.
 var RANGE_TOKEN = '__r';
 var CHECKBOX_RADIO_TOKEN = '__c';
 
@@ -7683,49 +7683,6 @@ var fieldListModule = {
   }
 };
 
-/*
- * Either wait for hoodie to load (if you're on the client),
- * or call hoodie directly somehow (if you're on the server) (@TODO),
- * then call the given function to process data.
- */
-var runHoodieFn = function runHoodieFn(commit, state, fn) {
-  if (typeof window !== 'undefined') {
-    // @TODO understand why the hoodie constant is not available here server side
-    // @TODO remove, just understanding that hoodie needs time to initialize
-    if (typeof hoodie === 'undefined') {
-      console.log('hoodie is not defined yet');
-    }
-
-    var waitForHoodieToLoad = new Promise(function (resolve, reject) {
-      var intervalId = void 0;
-
-      console.log('waiting for hoodie to load');
-
-      intervalId = setInterval(function () {
-        if (typeof hoodie !== 'undefined') {
-          console.log('hoodie loaded!');
-
-          clearInterval(intervalId);
-          hoodie.ready.then(function () {
-            fn(resolve, reject);
-          });
-        } else {
-          console.log('hoodie not loaded');
-        }
-      }, 20);
-    });
-
-    return waitForHoodieToLoad;
-  } else {
-    // @TODO: just return an empty object until we have something to show for this
-    return {};
-  }
-};
-
-var utils = {
-  runHoodieFn: runHoodieFn
-};
-
 var templateModule = {
   // namespace this module so that it doesn't collide with other store behavior
   namespaced: true, // -> getters['templates/*']
@@ -7759,23 +7716,26 @@ var templateModule = {
 
       var findAllTemplates = function findAllTemplates(resolve, reject) {
         // look through the DB for all the templates
-        hoodie.store.findAll().then(function (docs) {
-          return docs.filter(function (doc) {
-            return doc.templateName && !doc.isItem;
-          }); // filter out docs that have no templateName field
-        }).then(function (templateDocs) {
-          console.log('done loading templates');
-          console.log(templateDocs);
-          // update the store with the list of available templates
-          commit('TEMPLATE_LIST', templateDocs);
-          resolve(templateDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.findAll()
+          .then((docs) => {
+            return docs.filter(function (doc) { return doc.templateName && !doc.isItem }) // filter out docs that have no templateName field
+          })
+          .then((templateDocs) => {
+            console.log('done loading templates')
+            console.log(templateDocs)
+            // update the store with the list of available templates
+            commit('TEMPLATE_LIST', templateDocs)
+            resolve(templateDocs)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+        */
       };
 
-      return utils.runHoodieFn(commit, state, findAllTemplates);
+      return null;
     },
     getTemplate: function getTemplate(_ref2, id) {
       var commit = _ref2.commit,
@@ -7783,17 +7743,21 @@ var templateModule = {
 
       var findTemplate = function findTemplate(resolve, reject) {
         // look through the DB for all the items
-        hoodie.store.find(id).then(function (templateDoc) {
-          // update the store with the list of available items
-          commit('ACTIVE_TEMPLATE', templateDoc);
-          resolve(templateDoc);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.find(id)
+          .then((templateDoc) => {
+            // update the store with the list of available items
+            commit('ACTIVE_TEMPLATE', templateDoc)
+            resolve(templateDoc)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+        */
       };
 
-      return utils.runHoodieFn(commit, state, findTemplate);
+      return null;
     },
     setTemplate: function setTemplate(_ref3, template) {
       var commit = _ref3.commit,
@@ -7837,24 +7801,27 @@ var itemModule = {
 
       var findAllItems = function findAllItems(resolve, reject) {
         // look through the DB for all the items
-        hoodie.store.findAll().then(function (docs) {
-          console.log(docs);
-          return docs.filter(function (doc) {
-            return doc.isItem;
-          }); // only include docs where isItem is true
-        }).then(function (itemDocs) {
-          console.log('ITEMS FOUND:');
-          console.log(itemDocs);
-          // update the store with the list of available items
-          commit('ITEM_LIST', itemDocs);
-          resolve(itemDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.findAll()
+          .then((docs) => {
+            console.log(docs)
+            return docs.filter(doc => doc.isItem) // only include docs where isItem is true
+          })
+          .then((itemDocs) => {
+            console.log('ITEMS FOUND:')
+            console.log(itemDocs)
+            // update the store with the list of available items
+            commit('ITEM_LIST', itemDocs)
+            resolve(itemDocs)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+        */
       };
 
-      return utils.runHoodieFn(commit, state, findAllItems);
+      return null;
     },
     getItem: function getItem(_ref2, id) {
       var commit = _ref2.commit,
@@ -7862,17 +7829,21 @@ var itemModule = {
 
       var findItem = function findItem(resolve, reject) {
         // look through the DB for all the items
-        hoodie.store.find(id).then(function (itemDoc) {
-          // update the store with the list of available items
-          commit('ACTIVE_ITEM', itemDoc);
-          resolve(itemDoc);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.find(id)
+          .then((itemDoc) => {
+            // update the store with the list of available items
+            commit('ACTIVE_ITEM', itemDoc)
+            resolve(itemDoc)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+        */
       };
 
-      return utils.runHoodieFn(commit, state, findItem);
+      return null;
     },
     getToDoItems: function getToDoItems(_ref3) {
       var commit = _ref3.commit,
@@ -7880,98 +7851,103 @@ var itemModule = {
 
       var findAllToDoItems = function findAllToDoItems(resolve, reject) {
         // look through the DB for all the items
-        hoodie.store.findAll().then(function (docs) {
-          console.log(docs);
-          return docs.filter(function (doc) {
-            var completableFields = doc.fields.filter(function (field) {
-              return field.fieldType === 'CompletableField';
-            });
-
-            return doc.isItem && completableFields.length;
-          }); // only include docs where isItem is true
-        }).then(function (itemDocs) {
-          console.log('TO DO ITEMS FOUND:');
-          console.log(itemDocs);
-
-          // @TODO: Refactor into configurable system
-          // Sort items date desc
-          itemDocs.sort(function (itemA, itemB) {
-            var dateA = void 0,
-                dateB = void 0,
-                date = void 0,
-                time = void 0;
-
-            // get all relevant fields that have been filled out
-            var dateFieldsA = itemA.fields.filter(function (field) {
-              return field.fieldType === 'DateField' && field.value;
-            });
-            var dateFieldsB = itemB.fields.filter(function (field) {
-              return field.fieldType === 'DateField' && field.value;
-            });
-            var timeFieldsA = itemA.fields.filter(function (field) {
-              return field.fieldType === 'TimeField' && field.value;
-            });
-            var timeFieldsB = itemB.fields.filter(function (field) {
-              return field.fieldType === 'TimeField' && field.value;
-            });
-
-            // we're going to sort by the first date and time field we find,
-            // because how else are we going to do that
-            if (dateFieldsA.length || timeFieldsA.length) {
-              dateA = new Date();
-            }
-            if (dateFieldsA.length) {
-              date = dateFieldsA[0].value.split('-');
-              dateA.setYear(date[0]);
-              dateA.setMonth(date[1]);
-              dateA.setDate(date[2]);
-            }
-            if (timeFieldsA.length) {
-              time = timeFieldsA[0].value.split(':');
-              dateA.setHours(time[0]);
-              dateA.setMinutes(time[1]);
-            }
-
-            if (dateFieldsB.length || timeFieldsB.length) {
-              dateB = new Date();
-            }
-            if (dateFieldsB.length) {
-              date = dateFieldsB[0].value.split('-');
-              dateB.setYear(date[0]);
-              dateB.setMonth(date[1]);
-              dateB.setDate(date[2]);
-            }
-            if (timeFieldsB.length) {
-              time = timeFieldsB[0].value.split(':');
-              dateB.setHours(time[0]);
-              dateB.setMinutes(time[1]);
-            }
-
-            // sort by date desc
-            if (dateA && dateB) {
-              return dateB.getTime() - dateA.getTime();
-            } else if (dateA) {
-              // A < B
-              return -1;
-            } else if (dateB) {
-              // A > B
-              return 1;
-            } else {
-              // Neither have dates, so they're equal
-              return 0;
-            }
-          });
-
-          // update the store with the list of available items
-          commit('ITEM_LIST', itemDocs);
-          resolve(itemDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.findAll()
+          .then((docs) => {
+            console.log(docs)
+            return docs.filter(function (doc) {
+              const completableFields = doc.fields.filter(function (field) {
+                return field.fieldType === 'CompletableField'
+              })
+              
+              return doc.isItem && completableFields.length
+            }) // only include docs where isItem is true
+          })
+          .then((itemDocs) => {
+            console.log('TO DO ITEMS FOUND:')
+            console.log(itemDocs)
+            
+            // @TODO: Refactor into configurable system
+            // Sort items date desc
+            itemDocs.sort(function (itemA, itemB) {
+              let dateA,
+                dateB,
+                date,
+                time
+                  
+              // get all relevant fields that have been filled out
+              const dateFieldsA = itemA.fields.filter(function (field) {
+                return field.fieldType === 'DateField' && field.value
+              })
+              const dateFieldsB = itemB.fields.filter(function (field) {
+                return field.fieldType === 'DateField' && field.value
+              })
+              const timeFieldsA = itemA.fields.filter(function (field) {
+                return field.fieldType === 'TimeField' && field.value
+              })
+              const timeFieldsB = itemB.fields.filter(function (field) {
+                return field.fieldType === 'TimeField' && field.value
+              })
+              
+              // we're going to sort by the first date and time field we find,
+              // because how else are we going to do that
+              if (dateFieldsA.length || timeFieldsA.length) {
+                dateA = new Date()
+              }
+              if (dateFieldsA.length) {
+                date = dateFieldsA[0].value.split('-')
+                dateA.setYear(date[0])
+                dateA.setMonth(date[1])
+                dateA.setDate(date[2])
+              }
+              if (timeFieldsA.length) {
+                time = timeFieldsA[0].value.split(':')
+                dateA.setHours(time[0])
+                dateA.setMinutes(time[1])
+              }
+              
+              if (dateFieldsB.length || timeFieldsB.length) {
+                dateB = new Date()
+              }
+              if (dateFieldsB.length) {
+                date = dateFieldsB[0].value.split('-')
+                dateB.setYear(date[0])
+                dateB.setMonth(date[1])
+                dateB.setDate(date[2])
+              }
+              if (timeFieldsB.length) {
+                time = timeFieldsB[0].value.split(':')
+                dateB.setHours(time[0])
+                dateB.setMinutes(time[1])
+              }
+              
+              // sort by date desc
+              if (dateA && dateB) {
+                return dateB.getTime() - dateA.getTime()
+              } else if (dateA) {
+                // A < B
+                return -1
+              } else if (dateB) {
+                // A > B
+                return 1
+              } else {
+                // Neither have dates, so they're equal
+                return 0
+              }
+            })
+            
+            // update the store with the list of available items
+            commit('ITEM_LIST', itemDocs)
+            resolve(itemDocs)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+          */
       };
 
-      return utils.runHoodieFn(commit, state, findAllToDoItems);
+      return null;
     },
     setItem: function setItem(_ref4, item) {
       var commit = _ref4.commit,
@@ -8021,7 +7997,7 @@ var store = new index_esm.Store({
   }
 });
 
-var __dirname = '/home/ubuntu/workspace/src/router';
+var __dirname = '/Users/marth/Sites/orchard3/src/router';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -8062,6 +8038,15 @@ var _extends = Object.assign || function (target) {
 
   return target;
 };
+
+/*
+ * This is a text field. It can be of type text, email, password, etc.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this text field.
+ * @param {STRING} {REQUIRED} label       The label for this text field.
+ * @param {STRING} {OPTIONAL} type        The type of input field this will be. (text, password, email, etc.)
+ * @param {STRING} {OPTIONAL} placeholder The placeholder attribute for this text field.
+ */
 
 var TextField = {
   render: function render() {
@@ -8382,6 +8367,11 @@ var DisplayTimeSinceField = {
   }
 };
 
+/**
+ * This component will morph into the given field.
+ * NOTE: Remember to update this component with all relevant properties from possible fields,
+ * so the properties can be properly bound.
+ */
 var DisplayFieldMorpher = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('Display' + _vm.field.fieldType, { tag: "component", attrs: { "value": _vm.field.value } });
@@ -8427,6 +8417,14 @@ var DisplayItem = {
     }
   }
 };
+
+/**
+ * Shows a list of items and bundles for the current bundle directory.
+ *
+ * @TODO: Replace items with data pulled from DB.
+ *
+ * @param {STRING} {REQUIRED} path The bundle path to display.
+ */
 
 var fetchInitialData = function fetchInitialData(store) {
   return store.dispatch('items/getItems');
@@ -8524,6 +8522,13 @@ var NewPage = {
   }
 };
 
+/*
+ * This is a text field. It can be of type text, email, password, etc.
+ *
+ * @param {STRING} {REQUIRED} id       The id and name of this text field.
+ * @param {STRING} {REQUIRED} label    The label for this text field.
+ * @param {ARRAY}  {REQUIRED} options  An array containing the list of options, given in the format [{ label: 'string', value: 'string' }, ...]
+ */
 var DropdownField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { directives: [{ name: "model", rawName: "v-model", value: _vm.value, expression: "value" }], staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": [function ($event) {
@@ -8678,6 +8683,15 @@ var TextAreaField = {
   }
 };
 
+/*
+ * This is a date field.
+ * 
+ * @TODO: Add datepicker.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this date field.
+ * @param {STRING} {REQUIRED} label       The label for this date field.
+ */
+
 var DateField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": "date", "name": _vm.id, "placeholder": "yyyy-mm-dd" }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
@@ -8710,6 +8724,15 @@ var DateField = {
     }
   }
 };
+
+/*
+ * This is a time field.
+ * 
+ * @TODO: Add time picker, figure out time zones.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this field.
+ * @param {STRING} {REQUIRED} label       The label for this field.
+ */
 
 var TimeField = {
   render: function render() {
@@ -8797,6 +8820,16 @@ var CompletableField = {
   }
 };
 
+/*
+ * This is a time since field. This shows the amount of time that has elapsed
+ * since the time has been reset.
+ * 
+ * @TODO: Add datepicker.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this date field.
+ * @param {STRING} {REQUIRED} label       The label for this date field.
+ */
+
 var TimeSinceField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('span', { staticClass: "hxb-u-display-block" }, [_vm._v(_vm._s(_vm.value))]), _vm._v(" "), _c('button', { staticClass: "hxb-button", attrs: { "type": "button" }, on: { "click": _vm.resetTime } }, [_vm._v("Reset")])]);
@@ -8875,6 +8908,11 @@ var TimeSinceField = {
   }
 };
 
+/**
+ * This component will morph into the given field.
+ * NOTE: Remember to update this component with all relevant properties from possible fields,
+ * so the properties can be properly bound.
+ */
 var FieldMorpher = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.field.fieldType, { tag: "component", attrs: { "id": _vm.fieldId, "label": _vm.field.fieldLabel } });
@@ -8900,6 +8938,9 @@ var FieldMorpher = {
     TimeSinceField: TimeSinceField
   }
 };
+
+// @TODO: Get this to work without javascript,
+// and get this to work with reloading the page
 
 var NewItemPageStep2 = {
   render: function render() {
@@ -8974,6 +9015,9 @@ var RemoveButton = {
   }
 };
 
+/*
+ * options {ARRAY} - [{ label: 'string', value: 'string' }, ...]
+ */
 var RadioButtonField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('fieldset', { staticClass: "hxb-fieldset" }, [_c('legend', [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _vm._l(_vm.options, function (option, index) {
@@ -9183,6 +9227,7 @@ function immediate(task) {
   }
 }
 
+/* istanbul ignore next */
 function INTERNAL() {}
 
 var handlers = {};
@@ -9450,6 +9495,9 @@ function argsArray(fun) {
     }
   };
 }
+
+// shim for using process in browser
+// based off https://github.com/defunctzombie/node-process/blob/master/browser.js
 
 function defaultSetTimout() {
     throw new Error('setTimeout has not been defined');
@@ -11460,6 +11508,11 @@ var sparkMd5 = createCommonjsModule(function (module, exports) {
 }));
 });
 
+/**
+ * Stringify/parse functions that don't operate
+ * recursively, so they avoid call stack exceeded
+ * errors.
+ */
 var stringify = function stringify(input) {
   var queue = [];
   queue.push({obj: input});
@@ -11632,6 +11685,7 @@ var index$5 = {
 	parse: parse$1
 };
 
+/* istanbul ignore next */
 var PouchPromise$1 = typeof Promise === 'function' ? Promise : browser$1;
 
 function isBinaryObject(object) {
@@ -23026,10 +23080,10 @@ PouchDB$5.plugin(IDBPouch)
   .plugin(mapreduce)
   .plugin(replication);
 
-// Pull from src because pouchdb-node/pouchdb-browser themselves
-// are aggressively optimized and jsnext:main would normally give us this
-// aggressive bundle.
-
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
 var rng;
 
 var crypto = commonjsGlobal.crypto || commonjsGlobal.msCrypto; // for IE 11
@@ -23084,6 +23138,18 @@ function bytesToUuid(buf, offset) {
 
 var bytesToUuid_1 = bytesToUuid;
 
+// Unique ID creation requires a high quality random # generator.  We feature
+// detect to determine the best RNG source, normalizing to a function that
+// returns 128-bits of randomness, since that's what's usually required
+
+
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+// random #'s we need to init node and clockseq
 var _seedBytes = rngBrowser();
 
 // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
@@ -23306,6 +23372,14 @@ function addOne(db, doc, prefix) {
   });
 }
 
+/**
+ * Adds one object to the local database.
+ *
+ * @param  {PouchDB}  {REQUIRED} db       Reference to PouchDB
+ * @param  {Array}    {REQUIRED} docs     The object to be added to the db
+ * @param  {String}   {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
 function addMany(db, docs, prefix) {
   // copy over the objects to be added and add timestamps to them
   docs = docs.map(function (doc) {
@@ -23345,12 +23419,24 @@ function addMany(db, docs, prefix) {
   });
 }
 
+/**
+ * Adds one or multiple objects to the local database.
+ *
+ * @param  {PouchDB}      {REQUIRED} db       Reference to PouchDB
+ * @param  {Object|Array} {REQUIRED} objects  The object or objects to be added to the db
+ * @param  {String}       {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
 function add$1$1(objects, prefix) {
   var db = this;
 
   return Array.isArray(objects) ? addMany(db, objects, prefix) : addOne(db, objects, prefix);
 }
 
+/**
+ * This is a thin wrapper over the PouchDB API to automatically
+ * handle id and timestamps.
+ */
 var pleaseInit = function pleaseInit() {
   var api = {
     pleaseAdd: add$1$1
@@ -24013,7 +24099,7 @@ var StyleGuide = {
 };
 
 /**
-  * vue-router v2.3.1
+  * vue-router v2.2.1
   * (c) 2017 Evan You
   * @license MIT
   */
@@ -25908,11 +25994,9 @@ var HTML5History = (function (History$$1) {
   HTML5History.prototype.push = function push (location, onComplete, onAbort) {
     var this$1 = this;
 
-    var ref = this;
-    var fromRoute = ref.current;
     this.transitionTo(location, function (route) {
       pushState(cleanPath(this$1.base + route.fullPath));
-      handleScroll(this$1.router, route, fromRoute, false);
+      handleScroll(this$1.router, route, this$1.current, false);
       onComplete && onComplete(route);
     }, onAbort);
   };
@@ -25920,11 +26004,9 @@ var HTML5History = (function (History$$1) {
   HTML5History.prototype.replace = function replace (location, onComplete, onAbort) {
     var this$1 = this;
 
-    var ref = this;
-    var fromRoute = ref.current;
     this.transitionTo(location, function (route) {
       replaceState(cleanPath(this$1.base + route.fullPath));
-      handleScroll(this$1.router, route, fromRoute, false);
+      handleScroll(this$1.router, route, this$1.current, false);
       onComplete && onComplete(route);
     }, onAbort);
   };
@@ -26286,7 +26368,7 @@ function createHref (base, fullPath, mode) {
 }
 
 VueRouter.install = install$1;
-VueRouter.version = '2.3.1';
+VueRouter.version = '2.2.1';
 
 if (inBrowser$2 && window.Vue) {
   window.Vue.use(VueRouter);

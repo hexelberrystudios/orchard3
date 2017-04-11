@@ -6,7 +6,7 @@ var global$1 = typeof global !== "undefined" ? global :
             typeof window !== "undefined" ? window : {};
 
 /*!
- * Vue.js v2.2.6
+ * Vue.js v2.2.5
  * (c) 2014-2017 Evan You
  * Released under the MIT License.
  */
@@ -2092,9 +2092,6 @@ function lifecycleMixin (Vue) {
     }
     // call the last hook...
     vm._isDestroyed = true;
-    // invoke destroy hooks on current rendered tree
-    vm.__patch__(vm._vnode, null);
-    // fire destroyed hook
     callHook(vm, 'destroyed');
     // turn off all instance listeners.
     vm.$off();
@@ -2102,8 +2099,8 @@ function lifecycleMixin (Vue) {
     if (vm.$el) {
       vm.$el.__vue__ = null;
     }
-    // remove reference to DOM nodes (prevents leak)
-    vm.$options._parentElm = vm.$options._refElm = null;
+    // invoke destroy hooks on current rendered tree
+    vm.__patch__(vm._vnode, null);
   };
 }
 
@@ -2764,15 +2761,6 @@ function initComputed (vm, computed) {
   for (var key in computed) {
     var userDef = computed[key];
     var getter = typeof userDef === 'function' ? userDef : userDef.get;
-    {
-      if (getter === undefined) {
-        warn(
-          ("No getter function has been defined for computed property \"" + key + "\"."),
-          vm
-        );
-        getter = noop;
-      }
-    }
     // create internal watcher for the computed property.
     watchers[key] = new Watcher(vm, getter, noop, computedWatcherOptions);
 
@@ -3185,7 +3173,7 @@ function extractProps (data, Ctor, tag) {
         ) {
           tip(
             "Prop \"" + keyInLowerCase + "\" is passed to component " +
-            (formatComponentName(tag || Ctor)) + ", but the declared prop name is" +
+            (formatComponentName(tag || Ctor)) + ", but the delared prop name is" +
             " \"" + key + "\". " +
             "Note that HTML attributes are case-insensitive and camelCased " +
             "props need to use their kebab-case equivalents when using in-DOM " +
@@ -4164,7 +4152,7 @@ Object.defineProperty(Vue$2$1.prototype, '$isServer', {
   get: isServerRendering
 });
 
-Vue$2$1.version = '2.2.6';
+Vue$2$1.version = '2.2.5';
 
 /*  */
 
@@ -7695,49 +7683,6 @@ var fieldListModule = {
   }
 };
 
-/*
- * Either wait for hoodie to load (if you're on the client),
- * or call hoodie directly somehow (if you're on the server) (@TODO),
- * then call the given function to process data.
- */
-var runHoodieFn = function runHoodieFn(commit, state, fn) {
-  if (typeof window !== 'undefined') {
-    // @TODO understand why the hoodie constant is not available here server side
-    // @TODO remove, just understanding that hoodie needs time to initialize
-    if (typeof hoodie === 'undefined') {
-      console.log('hoodie is not defined yet');
-    }
-
-    var waitForHoodieToLoad = new Promise(function (resolve, reject) {
-      var intervalId = void 0;
-
-      console.log('waiting for hoodie to load');
-
-      intervalId = setInterval(function () {
-        if (typeof hoodie !== 'undefined') {
-          console.log('hoodie loaded!');
-
-          clearInterval(intervalId);
-          hoodie.ready.then(function () {
-            fn(resolve, reject);
-          });
-        } else {
-          console.log('hoodie not loaded');
-        }
-      }, 20);
-    });
-
-    return waitForHoodieToLoad;
-  } else {
-    // @TODO: just return an empty object until we have something to show for this
-    return {};
-  }
-};
-
-var utils = {
-  runHoodieFn: runHoodieFn
-};
-
 var templateModule = {
   // namespace this module so that it doesn't collide with other store behavior
   namespaced: true, // -> getters['templates/*']
@@ -7771,23 +7716,26 @@ var templateModule = {
 
       var findAllTemplates = function findAllTemplates(resolve, reject) {
         // look through the DB for all the templates
-        hoodie.store.findAll().then(function (docs) {
-          return docs.filter(function (doc) {
-            return doc.templateName && !doc.isItem;
-          }); // filter out docs that have no templateName field
-        }).then(function (templateDocs) {
-          console.log('done loading templates');
-          console.log(templateDocs);
-          // update the store with the list of available templates
-          commit('TEMPLATE_LIST', templateDocs);
-          resolve(templateDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.findAll()
+          .then((docs) => {
+            return docs.filter(function (doc) { return doc.templateName && !doc.isItem }) // filter out docs that have no templateName field
+          })
+          .then((templateDocs) => {
+            console.log('done loading templates')
+            console.log(templateDocs)
+            // update the store with the list of available templates
+            commit('TEMPLATE_LIST', templateDocs)
+            resolve(templateDocs)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+        */
       };
 
-      return utils.runHoodieFn(commit, state, findAllTemplates);
+      return null;
     },
     getTemplate: function getTemplate(_ref2, id) {
       var commit = _ref2.commit,
@@ -7795,17 +7743,21 @@ var templateModule = {
 
       var findTemplate = function findTemplate(resolve, reject) {
         // look through the DB for all the items
-        hoodie.store.find(id).then(function (templateDoc) {
-          // update the store with the list of available items
-          commit('ACTIVE_TEMPLATE', templateDoc);
-          resolve(templateDoc);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.find(id)
+          .then((templateDoc) => {
+            // update the store with the list of available items
+            commit('ACTIVE_TEMPLATE', templateDoc)
+            resolve(templateDoc)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+        */
       };
 
-      return utils.runHoodieFn(commit, state, findTemplate);
+      return null;
     },
     setTemplate: function setTemplate(_ref3, template) {
       var commit = _ref3.commit,
@@ -7849,24 +7801,27 @@ var itemModule = {
 
       var findAllItems = function findAllItems(resolve, reject) {
         // look through the DB for all the items
-        hoodie.store.findAll().then(function (docs) {
-          console.log(docs);
-          return docs.filter(function (doc) {
-            return doc.isItem;
-          }); // only include docs where isItem is true
-        }).then(function (itemDocs) {
-          console.log('ITEMS FOUND:');
-          console.log(itemDocs);
-          // update the store with the list of available items
-          commit('ITEM_LIST', itemDocs);
-          resolve(itemDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.findAll()
+          .then((docs) => {
+            console.log(docs)
+            return docs.filter(doc => doc.isItem) // only include docs where isItem is true
+          })
+          .then((itemDocs) => {
+            console.log('ITEMS FOUND:')
+            console.log(itemDocs)
+            // update the store with the list of available items
+            commit('ITEM_LIST', itemDocs)
+            resolve(itemDocs)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+        */
       };
 
-      return utils.runHoodieFn(commit, state, findAllItems);
+      return null;
     },
     getItem: function getItem(_ref2, id) {
       var commit = _ref2.commit,
@@ -7874,17 +7829,21 @@ var itemModule = {
 
       var findItem = function findItem(resolve, reject) {
         // look through the DB for all the items
-        hoodie.store.find(id).then(function (itemDoc) {
-          // update the store with the list of available items
-          commit('ACTIVE_ITEM', itemDoc);
-          resolve(itemDoc);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.find(id)
+          .then((itemDoc) => {
+            // update the store with the list of available items
+            commit('ACTIVE_ITEM', itemDoc)
+            resolve(itemDoc)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+        */
       };
 
-      return utils.runHoodieFn(commit, state, findItem);
+      return null;
     },
     getToDoItems: function getToDoItems(_ref3) {
       var commit = _ref3.commit,
@@ -7892,98 +7851,103 @@ var itemModule = {
 
       var findAllToDoItems = function findAllToDoItems(resolve, reject) {
         // look through the DB for all the items
-        hoodie.store.findAll().then(function (docs) {
-          console.log(docs);
-          return docs.filter(function (doc) {
-            var completableFields = doc.fields.filter(function (field) {
-              return field.fieldType === 'CompletableField';
-            });
-
-            return doc.isItem && completableFields.length;
-          }); // only include docs where isItem is true
-        }).then(function (itemDocs) {
-          console.log('TO DO ITEMS FOUND:');
-          console.log(itemDocs);
-
-          // @TODO: Refactor into configurable system
-          // Sort items date desc
-          itemDocs.sort(function (itemA, itemB) {
-            var dateA = void 0,
-                dateB = void 0,
-                date = void 0,
-                time = void 0;
-
-            // get all relevant fields that have been filled out
-            var dateFieldsA = itemA.fields.filter(function (field) {
-              return field.fieldType === 'DateField' && field.value;
-            });
-            var dateFieldsB = itemB.fields.filter(function (field) {
-              return field.fieldType === 'DateField' && field.value;
-            });
-            var timeFieldsA = itemA.fields.filter(function (field) {
-              return field.fieldType === 'TimeField' && field.value;
-            });
-            var timeFieldsB = itemB.fields.filter(function (field) {
-              return field.fieldType === 'TimeField' && field.value;
-            });
-
-            // we're going to sort by the first date and time field we find,
-            // because how else are we going to do that
-            if (dateFieldsA.length || timeFieldsA.length) {
-              dateA = new Date();
-            }
-            if (dateFieldsA.length) {
-              date = dateFieldsA[0].value.split('-');
-              dateA.setYear(date[0]);
-              dateA.setMonth(date[1]);
-              dateA.setDate(date[2]);
-            }
-            if (timeFieldsA.length) {
-              time = timeFieldsA[0].value.split(':');
-              dateA.setHours(time[0]);
-              dateA.setMinutes(time[1]);
-            }
-
-            if (dateFieldsB.length || timeFieldsB.length) {
-              dateB = new Date();
-            }
-            if (dateFieldsB.length) {
-              date = dateFieldsB[0].value.split('-');
-              dateB.setYear(date[0]);
-              dateB.setMonth(date[1]);
-              dateB.setDate(date[2]);
-            }
-            if (timeFieldsB.length) {
-              time = timeFieldsB[0].value.split(':');
-              dateB.setHours(time[0]);
-              dateB.setMinutes(time[1]);
-            }
-
-            // sort by date desc
-            if (dateA && dateB) {
-              return dateB.getTime() - dateA.getTime();
-            } else if (dateA) {
-              // A < B
-              return -1;
-            } else if (dateB) {
-              // A > B
-              return 1;
-            } else {
-              // Neither have dates, so they're equal
-              return 0;
-            }
-          });
-
-          // update the store with the list of available items
-          commit('ITEM_LIST', itemDocs);
-          resolve(itemDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        /*
+        hoodie.store.findAll()
+          .then((docs) => {
+            console.log(docs)
+            return docs.filter(function (doc) {
+              const completableFields = doc.fields.filter(function (field) {
+                return field.fieldType === 'CompletableField'
+              })
+              
+              return doc.isItem && completableFields.length
+            }) // only include docs where isItem is true
+          })
+          .then((itemDocs) => {
+            console.log('TO DO ITEMS FOUND:')
+            console.log(itemDocs)
+            
+            // @TODO: Refactor into configurable system
+            // Sort items date desc
+            itemDocs.sort(function (itemA, itemB) {
+              let dateA,
+                dateB,
+                date,
+                time
+                  
+              // get all relevant fields that have been filled out
+              const dateFieldsA = itemA.fields.filter(function (field) {
+                return field.fieldType === 'DateField' && field.value
+              })
+              const dateFieldsB = itemB.fields.filter(function (field) {
+                return field.fieldType === 'DateField' && field.value
+              })
+              const timeFieldsA = itemA.fields.filter(function (field) {
+                return field.fieldType === 'TimeField' && field.value
+              })
+              const timeFieldsB = itemB.fields.filter(function (field) {
+                return field.fieldType === 'TimeField' && field.value
+              })
+              
+              // we're going to sort by the first date and time field we find,
+              // because how else are we going to do that
+              if (dateFieldsA.length || timeFieldsA.length) {
+                dateA = new Date()
+              }
+              if (dateFieldsA.length) {
+                date = dateFieldsA[0].value.split('-')
+                dateA.setYear(date[0])
+                dateA.setMonth(date[1])
+                dateA.setDate(date[2])
+              }
+              if (timeFieldsA.length) {
+                time = timeFieldsA[0].value.split(':')
+                dateA.setHours(time[0])
+                dateA.setMinutes(time[1])
+              }
+              
+              if (dateFieldsB.length || timeFieldsB.length) {
+                dateB = new Date()
+              }
+              if (dateFieldsB.length) {
+                date = dateFieldsB[0].value.split('-')
+                dateB.setYear(date[0])
+                dateB.setMonth(date[1])
+                dateB.setDate(date[2])
+              }
+              if (timeFieldsB.length) {
+                time = timeFieldsB[0].value.split(':')
+                dateB.setHours(time[0])
+                dateB.setMinutes(time[1])
+              }
+              
+              // sort by date desc
+              if (dateA && dateB) {
+                return dateB.getTime() - dateA.getTime()
+              } else if (dateA) {
+                // A < B
+                return -1
+              } else if (dateB) {
+                // A > B
+                return 1
+              } else {
+                // Neither have dates, so they're equal
+                return 0
+              }
+            })
+            
+            // update the store with the list of available items
+            commit('ITEM_LIST', itemDocs)
+            resolve(itemDocs)
+          })
+          .catch((error) => {
+            console.log(error)
+            reject(error)
+          })
+          */
       };
 
-      return utils.runHoodieFn(commit, state, findAllToDoItems);
+      return null;
     },
     setItem: function setItem(_ref4, item) {
       var commit = _ref4.commit,
@@ -8033,7 +7997,33 @@ var store = new index_esm.Store({
   }
 });
 
-var __dirname = '/home/ubuntu/workspace/src/router';
+var __dirname = '/Users/marth/Sites/orchard3/src/router';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
@@ -23090,16 +23080,366 @@ PouchDB$5.plugin(IDBPouch)
   .plugin(mapreduce)
   .plugin(replication);
 
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
+var rng;
+
+var crypto = commonjsGlobal.crypto || commonjsGlobal.msCrypto; // for IE 11
+if (crypto && crypto.getRandomValues) {
+  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+  var rnds8 = new Uint8Array(16);
+  rng = function whatwgRNG() {
+    crypto.getRandomValues(rnds8);
+    return rnds8;
+  };
+}
+
+if (!rng) {
+  // Math.random()-based (RNG)
+  //
+  // If all else fails, use Math.random().  It's fast, but is of unspecified
+  // quality.
+  var  rnds = new Array(16);
+  rng = function() {
+    for (var i = 0, r; i < 16; i++) {
+      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+    }
+
+    return rnds;
+  };
+}
+
+var rngBrowser = rng;
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  return  bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]];
+}
+
+var bytesToUuid_1 = bytesToUuid;
+
+// Unique ID creation requires a high quality random # generator.  We feature
+// detect to determine the best RNG source, normalizing to a function that
+// returns 128-bits of randomness, since that's what's usually required
+
+
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+// random #'s we need to init node and clockseq
+var _seedBytes = rngBrowser();
+
+// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+var _nodeId = [
+  _seedBytes[0] | 0x01,
+  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+];
+
+// Per 4.2.2, randomize (14 bit) clockseq
+var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+
+// Previous uuid creation time
+var _lastMSecs = 0;
+var _lastNSecs = 0;
+
+// See https://github.com/broofa/node-uuid for API details
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || [];
+
+  options = options || {};
+
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+  // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+  // Time since last uuid creation (in msecs)
+  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+  // Per 4.2.1.2, Bump clockseq on clock regression
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  }
+
+  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  }
+
+  // Per 4.2.1.2 Throw error if too many uuids are requested
+  if (nsecs >= 10000) {
+    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq;
+
+  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+  msecs += 12219292800000;
+
+  // `time_low`
+  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff;
+
+  // `time_mid`
+  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff;
+
+  // `time_high_and_version`
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+  b[i++] = tmh >>> 16 & 0xff;
+
+  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+  b[i++] = clockseq >>> 8 | 0x80;
+
+  // `clock_seq_low`
+  b[i++] = clockseq & 0xff;
+
+  // `node`
+  var node = options.node || _nodeId;
+  for (var n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf ? buf : bytesToUuid_1(b);
+}
+
+var v1_1 = v1;
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options == 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rngBrowser)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid_1(rnds);
+}
+
+var v4_1 = v4;
+
+var uuid$1 = v4_1;
+uuid$1.v1 = v1_1;
+uuid$1.v4 = v4_1;
+
+var index$6 = uuid$1;
+
+if (typeof Object.assign !== 'function') {
+  // lite Object.assign polyfill based on
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+  Object.assign = function (target) {
+    var to = Object(target);
+
+    for (var index = 1; index < arguments.length; index++) {
+      var nextSource = arguments[index];
+
+      if (nextSource != null) {
+        // Skip over if undefined or null
+        for (var nextKey in nextSource) {
+          // Avoid bugs when hasOwnProperty is shadowed
+          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+    }
+    return to;
+  };
+}
+
+var assign$1 = Object.assign;
+
+/**
+ * Generates the current date time.
+ * 
+ * @returns The current date time as a string.
+ */
+function now() {
+  return new Date().toISOString();
+}
+
+function addTimestamps(doc) {
+  if (doc.createdAt) {
+    doc.updatedAt = now();
+  } else {
+    doc.createdAt = now();
+  }
+
+  if (doc._deleted) {
+    doc.deletedAt = doc.deletedAt || doc.updatedAt;
+  }
+
+  return doc;
+}
+
+/**
+ * Adds one object to the local database.
+ *
+ * @param  {PouchDB}  {REQUIRED} db       Reference to PouchDB
+ * @param  {Object}   {REQUIRED} doc      The object to be added to the db
+ * @param  {String}   {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
+function addOne(db, doc, prefix) {
+  if ((typeof doc === 'undefined' ? 'undefined' : _typeof(doc)) !== 'object') {
+    return Promise.reject('Document must be a JSON object');
+  }
+
+  // copy document, to make sure we don't affect the original
+  doc = assign$1({}, doc);
+
+  // generate an id if we don't already have one
+  if (!doc._id) {
+    doc._id = index$6();
+  }
+
+  // prefixes can be added to ids to significantly reduce the possibility for collision
+  if (prefix) {
+    doc._id = prefix + doc._id;
+  }
+
+  // add createdAt/updatedAt timestamps
+  doc = addTimestamps(doc);
+  return db.put(doc).then(function (response) {
+    // make sure to include the latest id and revision information
+    doc._id = response.id;
+    doc._rev = response.rev;
+    return doc;
+  }).catch(function (error) {
+    var conflict = void 0;
+
+    if (error.status === 409) {
+      conflict = new Error('Object with id "' + doc._id + '" already exists');
+      conflict.name = 'Conflict';
+      conflict.status = 409;
+
+      throw conflict;
+    } else {
+      throw error;
+    }
+  });
+}
+
+/**
+ * Adds one object to the local database.
+ *
+ * @param  {PouchDB}  {REQUIRED} db       Reference to PouchDB
+ * @param  {Array}    {REQUIRED} docs     The object to be added to the db
+ * @param  {String}   {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
+function addMany(db, docs, prefix) {
+  // copy over the objects to be added and add timestamps to them
+  docs = docs.map(function (doc) {
+    doc = assign$1({}, doc);
+    return addTimestamps(doc);
+  });
+
+  if (prefix) {
+    docs.forEach(function (doc) {
+      doc._id = prefix + (doc._id || index$6());
+    });
+  }
+
+  // make sure we make a bulk call to CouchDB for performance
+  return db.bulkDocs(docs).then(function (responses) {
+    // check through all the responses
+    return responses.map(function (response, i) {
+      var conflict = void 0;
+      // found an error/conflict. note it and move on.
+      if (response instanceof Error) {
+        if (response.status === 409) {
+          conflict = new Error('Object with id "' + docs[i]._id + '" already exists');
+          conflict.name = 'Conflict';
+          conflict.status = 409;
+
+          return conflict;
+        } else {
+          return response;
+        }
+      }
+
+      // make sure to include the latest id and revision information
+      docs[i]._id = response.id;
+      docs[i]._rev = response.rev;
+      return docs[i];
+    });
+  });
+}
+
+/**
+ * Adds one or multiple objects to the local database.
+ *
+ * @param  {PouchDB}      {REQUIRED} db       Reference to PouchDB
+ * @param  {Object|Array} {REQUIRED} objects  The object or objects to be added to the db
+ * @param  {String}       {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
+function add$1$1(objects, prefix) {
+  var db = this;
+
+  return Array.isArray(objects) ? addMany(db, objects, prefix) : addOne(db, objects, prefix);
+}
+
 /**
  * This is a thin wrapper over the PouchDB API to automatically
  * handle id and timestamps.
  */
-var pleaseInit$1 = function pleaseInit() {
+var pleaseInit = function pleaseInit() {
   var api = {
-    pleaseTest: function pleaseTest() {
-      console.log('db:');
-      console.log(this);
-    }
+    pleaseAdd: add$1$1
   };
 
   return api;
@@ -23120,7 +23460,51 @@ if (typeof window !== 'undefined' && window.PouchDB) {
   window.PouchDB.plugin(exports);
 }
 
-PouchDB$5.plugin(pleaseInit$1());
+var db = void 0;
+var remoteDB = void 0;
+
+var lib = {
+  /**
+   * PouchDB singleton.
+   * Get and/or instantiate PouchDB instance.
+   * If dbName is defined, a remote PouchDB instance will be created.
+   * 
+   * @param dbName [STRING] [OPTIONAL] The remote db to sync with.
+   * 
+   * @returns The local PouchDB instance on the client, null on the server.
+   */
+  get: function get(dbName) {
+    if (typeof module === 'undefined') {
+      if (!db) {
+        PouchDB$5.plugin(pleaseInit());
+
+        db = new PouchDB$5('local_db');
+      }
+
+      if (dbName) {
+        // REQUIREMENT: We must be logged in in order for this to work
+        remoteDB = new PouchDB$5(dbName);
+        // if we wanted to maintain a live connection with the remote db, we could do the following:
+        // db.sync(remoteDB, {live: true, retry: true}).on('error', console.log.bind(console));
+        // some CouchDB providers do not support this though, and it can be expensive, so let's not for now.
+      }
+
+      return db;
+    } else {
+      // @TODO: Figure out server side response
+      return null;
+    }
+  },
+
+  /**
+   * Sync the local and remote DB, if available.
+   */
+  remoteSync: function remoteSync() {
+    if (db && remoteDB) {
+      db.sync(remoteDB);
+    }
+  }
+};
 
 var NewTemplatePage = {
   render: function render() {
@@ -23169,17 +23553,17 @@ var NewTemplatePage = {
         }
       }
 
-      var db = db.get();
-      /*
+      var db = lib.get();
       db.pleaseAdd({
-            templateName: name,
-            fields: fields
-          }).then(function (resp) {
-            console.log(resp)
-            // redirect to the home page when finished
-            self.$router.push('/app/home')
-          })
-          */
+        templateName: name,
+        fields: fields
+      }).then(function (resp) {
+        console.log(resp);
+        // redirect to the home page when finished
+        self.$router.push('/app/home');
+      }).catch(function (err) {
+        console.log(err);
+      });
     },
     removeField: function removeField(fieldIndex) {
       console.log('Calling removeField in NewItemPage on index ' + fieldIndex);
@@ -23715,7 +24099,7 @@ var StyleGuide = {
 };
 
 /**
-  * vue-router v2.3.1
+  * vue-router v2.2.1
   * (c) 2017 Evan You
   * @license MIT
   */
@@ -24379,7 +24763,7 @@ var isarray = index$1$2;
 /**
  * Expose `pathToRegexp`.
  */
-var index$6 = pathToRegexp;
+var index$7 = pathToRegexp;
 var parse_1 = parse$2;
 var compile_1 = compile;
 var tokensToFunction_1 = tokensToFunction;
@@ -24801,10 +25185,10 @@ function pathToRegexp (path, keys, options) {
   return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
 
-index$6.parse = parse_1;
-index$6.compile = compile_1;
-index$6.tokensToFunction = tokensToFunction_1;
-index$6.tokensToRegExp = tokensToRegExp_1;
+index$7.parse = parse_1;
+index$7.compile = compile_1;
+index$7.tokensToFunction = tokensToFunction_1;
+index$7.tokensToRegExp = tokensToRegExp_1;
 
 /*  */
 
@@ -24819,7 +25203,7 @@ function getRouteRegex (path) {
     regexp = hit.regexp;
   } else {
     keys = [];
-    regexp = index$6(path, keys);
+    regexp = index$7(path, keys);
     regexpCache[path] = { keys: keys, regexp: regexp };
   }
 
@@ -24836,7 +25220,7 @@ function fillParams (
   try {
     var filler =
       regexpCompileCache[path] ||
-      (regexpCompileCache[path] = index$6.compile(path));
+      (regexpCompileCache[path] = index$7.compile(path));
     return filler(params || {}, { pretty: true })
   } catch (e) {
     {
@@ -24861,9 +25245,9 @@ function normalizeLocation (
 
   // relative params
   if (!next.path && next.params && current) {
-    next = assign$1({}, next);
+    next = assign$2({}, next);
     next._normalized = true;
-    var params = assign$1(assign$1({}, current.params), next.params);
+    var params = assign$2(assign$2({}, current.params), next.params);
     if (current.name) {
       next.name = current.name;
       next.params = params;
@@ -24895,7 +25279,7 @@ function normalizeLocation (
   }
 }
 
-function assign$1 (a, b) {
+function assign$2 (a, b) {
   for (var key in b) {
     a[key] = b[key];
   }
@@ -25610,11 +25994,9 @@ var HTML5History = (function (History$$1) {
   HTML5History.prototype.push = function push (location, onComplete, onAbort) {
     var this$1 = this;
 
-    var ref = this;
-    var fromRoute = ref.current;
     this.transitionTo(location, function (route) {
       pushState(cleanPath(this$1.base + route.fullPath));
-      handleScroll(this$1.router, route, fromRoute, false);
+      handleScroll(this$1.router, route, this$1.current, false);
       onComplete && onComplete(route);
     }, onAbort);
   };
@@ -25622,11 +26004,9 @@ var HTML5History = (function (History$$1) {
   HTML5History.prototype.replace = function replace (location, onComplete, onAbort) {
     var this$1 = this;
 
-    var ref = this;
-    var fromRoute = ref.current;
     this.transitionTo(location, function (route) {
       replaceState(cleanPath(this$1.base + route.fullPath));
-      handleScroll(this$1.router, route, fromRoute, false);
+      handleScroll(this$1.router, route, this$1.current, false);
       onComplete && onComplete(route);
     }, onAbort);
   };
@@ -25988,7 +26368,7 @@ function createHref (base, fullPath, mode) {
 }
 
 VueRouter.install = install$1;
-VueRouter.version = '2.3.1';
+VueRouter.version = '2.2.1';
 
 if (inBrowser$2 && window.Vue) {
   window.Vue.use(VueRouter);
