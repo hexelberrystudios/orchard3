@@ -5,13 +5,13 @@ import isntDesignDoc from '../utils/isnt-design-doc'
 /**
  * Update multiple objects to the local database.
  *
- * @param  {PouchDB}         {REQUIRED} db                Reference to PouchDB
  * @param  {Function|Object} {REQUIRED} changedProperties Changed properties or function that alters passed doc
  * @param  {String}          {OPTIONAL} prefix            Optional id prefix
  * @return {Promise}
  */
-function updateAll (db, changedProperties, prefix) {
+function updateAll (changedProperties, prefix) {
   let docs
+  const db = this
   const type = typeof changedProperties,
     options = {
       include_docs: true

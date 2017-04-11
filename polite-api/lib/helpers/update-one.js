@@ -9,7 +9,7 @@ import changeObject from '../utils/change-object'
  * @param  {PouchDB}         {REQUIRED} db         Reference to PouchDB
  * @param  {String|Object}   {REQUIRED} idOrObject An id or object
  * @param  {Function|Object} {REQUIRED} change     Changed properties or function that alters passed doc
- * @param  {String}          {OPTIONAL} prefix     optional id prefix
+ * @param  {String}          {OPTIONAL} prefix     Optional id prefix
  * @return {Promise}
  */
 function updateOne (db, idOrDoc, change, prefix) {

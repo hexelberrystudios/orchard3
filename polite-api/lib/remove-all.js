@@ -9,11 +9,12 @@ import addTimestamps from './utils/add-timestamps'
  * @param  {String}   {OPTIONAL} prefix Optional id prefix
  * @return {Promise}
  */
-function removeAll (db, filter, prefix) {
+function removeAll (filter, prefix) {
+  let docs
+  const db = this
   const options = {
     include_docs: true
   }
-  let docs
 
   if (prefix) {
     options.startkey = prefix

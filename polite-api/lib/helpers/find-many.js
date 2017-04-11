@@ -9,7 +9,7 @@ import toId from '../utils/to-id'
  * @return {Promise}
  */
 function findMany (db, idsOrObjects, prefix) {
-  const ids = idsOrObjects.map(toId)
+  let ids = idsOrObjects.map(toId)
 
   // add prefix if it's not included in the id already
   if (prefix) {

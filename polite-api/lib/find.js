@@ -4,17 +4,16 @@ import findMany from './helpers/find-many'
 /**
  * finds existing object in local database
  *
- * @param  {String|Object} {REQUIRED} idOrObject  Id of object or object with `._id` property
- * 
- * @param  {String}        {OPTIONAL} prefix      Optional id prefix
+ * @param  {Array}   {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {String}  {OPTIONAL} prefix       Optional id prefix
  * @return {Promise}
  */
-function find (objectsOrIds, prefix) {
+function find (idsOrObjects, prefix) {
   const db = this
 
-  return Array.isArray(objectsOrIds)
-    ? findMany(db, objectsOrIds, prefix)
-    : findOne(db, objectsOrIds, prefix)
+  return Array.isArray(idsOrObjects)
+    ? findMany(db, idsOrObjects, prefix)
+    : findOne(db, idsOrObjects, prefix)
 }
 
 export default find

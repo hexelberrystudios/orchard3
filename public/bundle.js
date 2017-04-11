@@ -6,7 +6,7 @@ var global$1 = typeof global !== "undefined" ? global :
             typeof window !== "undefined" ? window : {};
 
 /*!
- * Vue.js v2.2.5
+ * Vue.js v2.2.6
  * (c) 2014-2017 Evan You
  * Released under the MIT License.
  */
@@ -2092,6 +2092,9 @@ function lifecycleMixin (Vue) {
     }
     // call the last hook...
     vm._isDestroyed = true;
+    // invoke destroy hooks on current rendered tree
+    vm.__patch__(vm._vnode, null);
+    // fire destroyed hook
     callHook(vm, 'destroyed');
     // turn off all instance listeners.
     vm.$off();
@@ -2099,8 +2102,8 @@ function lifecycleMixin (Vue) {
     if (vm.$el) {
       vm.$el.__vue__ = null;
     }
-    // invoke destroy hooks on current rendered tree
-    vm.__patch__(vm._vnode, null);
+    // remove reference to DOM nodes (prevents leak)
+    vm.$options._parentElm = vm.$options._refElm = null;
   };
 }
 
@@ -2761,6 +2764,15 @@ function initComputed (vm, computed) {
   for (var key in computed) {
     var userDef = computed[key];
     var getter = typeof userDef === 'function' ? userDef : userDef.get;
+    {
+      if (getter === undefined) {
+        warn(
+          ("No getter function has been defined for computed property \"" + key + "\"."),
+          vm
+        );
+        getter = noop;
+      }
+    }
     // create internal watcher for the computed property.
     watchers[key] = new Watcher(vm, getter, noop, computedWatcherOptions);
 
@@ -3173,7 +3185,7 @@ function extractProps (data, Ctor, tag) {
         ) {
           tip(
             "Prop \"" + keyInLowerCase + "\" is passed to component " +
-            (formatComponentName(tag || Ctor)) + ", but the delared prop name is" +
+            (formatComponentName(tag || Ctor)) + ", but the declared prop name is" +
             " \"" + key + "\". " +
             "Note that HTML attributes are case-insensitive and camelCased " +
             "props need to use their kebab-case equivalents when using in-DOM " +
@@ -4152,7 +4164,7 @@ Object.defineProperty(Vue$2$1.prototype, '$isServer', {
   get: isServerRendering
 });
 
-Vue$2$1.version = '2.2.5';
+Vue$2$1.version = '2.2.6';
 
 /*  */
 
@@ -7968,7 +7980,7 @@ var defaultState = {
 var inBrowser$1 = typeof window !== 'undefined';
 
 // if in browser, use pre-fetched state injected by SSR
-var state = inBrowser$1 && window.__INITIAL_STATE__ || defaultState;
+var state$1 = inBrowser$1 && window.__INITIAL_STATE__ || defaultState;
 
 var mutations = {
   TOPICS_LIST: function TOPICS_LIST(state, topics) {
@@ -7985,7 +7997,7 @@ var mutations = {
 };
 
 var store = new index_esm.Store({
-  state: state,
+  state: state$1,
   actions: actions,
   mutations: mutations,
   getters: getters,
@@ -7997,7 +8009,7 @@ var store = new index_esm.Store({
   }
 });
 
-var __dirname = '/Users/marth/Sites/orchard3/src/router';
+var __dirname = '/home/ubuntu/workspace/src/router';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -23080,6 +23092,31 @@ PouchDB$5.plugin(IDBPouch)
   .plugin(mapreduce)
   .plugin(replication);
 
+if (typeof Object.assign !== 'function') {
+  // lite Object.assign polyfill based on
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+  Object.assign = function (target) {
+    var to = Object(target);
+
+    for (var index = 1; index < arguments.length; index++) {
+      var nextSource = arguments[index];
+
+      if (nextSource != null) {
+        // Skip over if undefined or null
+        for (var nextKey in nextSource) {
+          // Avoid bugs when hasOwnProperty is shadowed
+          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+    }
+    return to;
+  };
+}
+
+var assign$1 = Object.assign;
+
 // Unique ID creation requires a high quality random # generator.  In the
 // browser this is a little complicated due to unknown quality of Math.random()
 // and inconsistent support for the `crypto` API.  We do the best we can via
@@ -23276,31 +23313,6 @@ uuid$1.v4 = v4_1;
 
 var index$6 = uuid$1;
 
-if (typeof Object.assign !== 'function') {
-  // lite Object.assign polyfill based on
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
-  Object.assign = function (target) {
-    var to = Object(target);
-
-    for (var index = 1; index < arguments.length; index++) {
-      var nextSource = arguments[index];
-
-      if (nextSource != null) {
-        // Skip over if undefined or null
-        for (var nextKey in nextSource) {
-          // Avoid bugs when hasOwnProperty is shadowed
-          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-            to[nextKey] = nextSource[nextKey];
-          }
-        }
-      }
-    }
-    return to;
-  };
-}
-
-var assign$1 = Object.assign;
-
 /**
  * Generates the current date time.
  * 
@@ -23352,10 +23364,11 @@ function addOne(db, doc, prefix) {
 
   // add createdAt/updatedAt timestamps
   doc = addTimestamps(doc);
-  return db.put(doc).then(function (response) {
+  return db.put().then(function (response) {
     // make sure to include the latest id and revision information
     doc._id = response.id;
     doc._rev = response.rev;
+
     return doc;
   }).catch(function (error) {
     var conflict = void 0;
@@ -23434,12 +23447,354 @@ function add$1$1(objects, prefix) {
 }
 
 /**
+ * Destroys db.
+ */
+function clear() {
+  var db = this;
+
+  return db.destroy();
+}
+
+/**
+ * Checks for a design doc, so we can filter out docs that shouldn't return in *All methods
+ */
+function isntDesignDoc(row) {
+  return row.id.match(/^_design/) === null;
+}
+
+/**
+ * Finds all existing objects in local database.
+ *
+ * @param  {Function} {REQUIRED} filter   Function returning `true` for any object
+ *                                        to be returned.
+ * @param  {String}   {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
+function findAll(filter, prefix) {
+  var db = this;
+
+  var options = {
+    include_docs: true
+  };
+
+  if (prefix) {
+    options.startkey = prefix;
+    options.endkey = prefix + '\uFFFF';
+  }
+
+  return db.allDocs(options).then(function (res) {
+    var objects = res.rows.filter(isntDesignDoc).map(function (row) {
+      return row.doc;
+    });
+
+    return typeof filter === 'function' ? objects.filter(filter) : objects;
+  });
+}
+
+function idOrObjectToId(idOrObject) {
+  return (typeof idOrObject === 'undefined' ? 'undefined' : _typeof(idOrObject)) === 'object' ? idOrObject._id : idOrObject;
+}
+
+/**
+ * Returns the object matching the given id or object.
+ *
+ * @param  {PouchDB}       {REQUIRED} db         Reference to PouchDB
+ * @param  {String|Object} {REQUIRED} idOrObject An array of ids or objects
+ * @param  {String}        {OPTIONAL} prefix     optional id prefix
+ * @return {Promise}
+ */
+function findOne(db, idOrObject, prefix) {
+  var id = idOrObjectToId(idOrObject);
+
+  // add prefix if it's not included in the id already
+  if (prefix && id.substr(0, prefix.length) !== prefix) {
+    id = prefix + id;
+  }
+
+  return db.get(id).catch(function (error) {
+    var missing = void 0;
+
+    if (error.status === 404) {
+      missing = new Error('Object with id "' + id + '" is missing');
+      missing.name = 'Not found';
+      missing.status = 404;
+      throw missing;
+    } else {
+      throw error;
+    }
+  });
+}
+
+/**
+ * Returns all objects matching the given ids or objects.
+ *
+ * @param  {PouchDB}  {REQUIRED} db           Reference to PouchDB
+ * @param  {Array}    {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {String}   {OPTIONAL} prefix       optional id prefix
+ * @return {Promise}
+ */
+function findMany(db, idsOrObjects, prefix) {
+  var ids = idsOrObjects.map(idOrObjectToId);
+
+  // add prefix if it's not included in the id already
+  if (prefix) {
+    ids = ids.map(function (id) {
+      return id.substr(0, prefix.length) === prefix ? id : prefix + id;
+    });
+  }
+
+  return state.db.allDocs({ keys: ids, include_docs: true }).then(function (response) {
+    // gather a hashmap of ids
+    var docsById = response.rows.reduce(function (map, row) {
+      map[row.id] = row.doc;
+      return map;
+    }, {});
+
+    // for each requested id, use foundMap to get the document with the matching id
+    var docs = ids.map(function (id) {
+      var doc = docsById[id];
+      if (doc) {
+        return doc;
+      } else {
+        var missing = new Error('Object with id "' + id + '" is missing');
+
+        missing.name = 'Not found';
+        missing.status = 404;
+
+        return missing;
+      }
+    });
+
+    return docs;
+  });
+}
+
+/**
+ * finds existing object in local database
+ *
+ * @param  {Array}   {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {String}  {OPTIONAL} prefix       Optional id prefix
+ * @return {Promise}
+ */
+function find(idsOrObjects, prefix) {
+  var db = this;
+
+  return Array.isArray(idsOrObjects) ? findMany(db, idsOrObjects, prefix) : findOne(db, idsOrObjects, prefix);
+}
+
+/**
+ * Removes existing object
+ *
+ * @param  {PouchDB}  {REQUIRED} db     Reference to PouchDB
+ * @param  {Function} {REQUIRED} filter Function returning `true` for any doc to be removed.
+ * @param  {String}   {OPTIONAL} prefix Optional id prefix
+ * @return {Promise}
+ */
+function removeAll(filter, prefix) {
+  var docs = void 0;
+  var db = this;
+  var options = {
+    include_docs: true
+  };
+
+  if (prefix) {
+    options.startkey = prefix;
+    options.endkey = prefix + '\uFFFF';
+  }
+
+  return db.allDocs(options).then(function (res) {
+    docs = res.rows.filter(isntDesignDoc).map(function (row) {
+      return row.doc;
+    });
+
+    if (typeof filter === 'function') {
+      docs = docs.filter(filter);
+    }
+
+    return docs.map(function (doc) {
+      doc._deleted = true;
+      return addTimestamps(doc);
+    });
+  }).then(db.bulkDocs.bind(db)).then(function (results) {
+    return results.map(function (result, i) {
+      docs[i]._rev = result.rev;
+      return docs[i];
+    });
+  });
+}
+
+/**
+  * Change object either by passing changed properties
+  * as an object, or by passing a change function that
+  * manipulates the passed object directly.
+  **/
+function changeObject$1(change, object) {
+  if ((typeof change === 'undefined' ? 'undefined' : _typeof(change)) === 'object') {
+    assign$1(object, change);
+  } else {
+    change(object);
+  }
+
+  return object;
+}
+
+/**
+ * Update one object to the local database.
+ *
+ * @param  {PouchDB}         {REQUIRED} db         Reference to PouchDB
+ * @param  {String|Object}   {REQUIRED} idOrObject An id or object
+ * @param  {Function|Object} {REQUIRED} change     Changed properties or function that alters passed doc
+ * @param  {String}          {OPTIONAL} prefix     Optional id prefix
+ * @return {Promise}
+ */
+function updateOne(db, idOrDoc, change, prefix) {
+  var doc = void 0;
+
+  if (typeof idOrDoc === 'string' && !change) {
+    return Promise.reject('Document must be a JSON object');
+  }
+
+  return findOne(db, idOrDoc, prefix).then(function (doc) {
+    if (!change) {
+      return assign$1(doc, idOrDoc, { _id: doc._id, _rev: doc._rev });
+    } else {
+      return changeObject$1(change, doc);
+    }
+  }).then(function (_doc) {
+    doc = _doc;
+    return db.put(addTimestamps(doc));
+  }).then(function (response) {
+    doc._rev = response.rev;
+    return doc;
+  });
+}
+
+/**
+ * Update one object to the local database.
+ *
+ * @param  {PouchDB}         {REQUIRED} db           Reference to PouchDB
+ * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {Function|Object} {REQUIRED} change       Changed properties or function that alters passed doc
+ * @param  {String}          {OPTIONAL} prefix       Optional id prefix
+ * @return {Promise}
+ */
+function updateMany(db, idsOrObjects, change, prefix) {
+  var docs = void 0;
+  var ids = idsOrObjects.map(function (doc) {
+    var id = idOrObjectToId(doc);
+
+    if (prefix && id.substr(0, prefix.length) !== prefix) {
+      id = prefix + id;
+    }
+
+    return id;
+  });
+
+  return findMany(db, ids, prefix).then(function (docs) {
+    if (change) {
+      return docs.map(function (doc) {
+        if (doc instanceof Error) {
+          return doc;
+        } else {
+          return changeObject$1(change, doc);
+        }
+      });
+    }
+
+    return docs.map(function (doc, index) {
+      var passedDoc = idsOrObjects[index];
+
+      if (doc instanceof Error) {
+        return doc;
+      } else if ((typeof passedDoc === 'undefined' ? 'undefined' : _typeof(passedDoc)) !== 'object') {
+        return Promise.reject('Document must be a JSON object');
+      } else {
+        return assign$1(doc, passedDoc, { _id: doc._id, _rev: doc._rev });
+      }
+    });
+  }).then(function (_docs) {
+    var validObjects = void 0;
+    docs = _docs;
+
+    validObjects = docs.filter(function (doc) {
+      return !(doc instanceof Error);
+    });
+
+    validObjects.forEach(addTimestamps);
+
+    return db.bulkDocs(validObjects);
+  }).then(function (responses) {
+    responses.forEach(function (response) {
+      var index = ids.indexOf(response.id);
+
+      docs[index]._rev = response.rev;
+    });
+
+    return docs;
+  });
+}
+
+/**
+ * Normalizes objectOrId, applies changes if any, and mark as deleted
+ * 
+ * @param  {Function|Object} {REQUIRED} change     Changed properties or function that alters passed doc
+ * @param  {String|Object}   {REQUIRED} idOrObject An id or object
+ */
+function markAsDeleted(change, idOrObject) {
+  var object = typeof idOrObject === 'string' ? { _id: idOrObject } : idOrObject;
+
+  if (change) {
+    changeObject(change, object);
+  }
+
+  return assign$1({ _deleted: true }, object);
+}
+
+/**
+ * Removes existing object
+ *
+ * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {Object|Function} {OPTIONAL} change       Change properties or function that changes existing object
+ * @param  {String}          {OPTIONAL} prefix       Optional id prefix
+ * @return {Promise}
+ */
+function remove$1$1(idsOrObjects, change, prefix) {
+  var db = this;
+
+  return Array.isArray(idsOrObjects) ? updateMany(db, idsOrObjects.map(markAsDeleted.bind(null, change)), null, prefix) : updateOne(db, markAsDeleted(change, idsOrObjects), null, prefix);
+}
+
+/**
+ * Updates existing object.
+ * 
+ * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {Function|Object} {REQUIRED} change       Changed properties or function that alters passed doc
+ * @param  {String}          {OPTIONAL} prefix       Optional id prefix
+ * @return {Promise}
+ */
+function update$1(idsOrObjects, change, prefix) {
+  var db = this;
+
+  if ((typeof idsOrObjects === 'undefined' ? 'undefined' : _typeof(idsOrObjects)) !== 'object' && !change) {
+    return Promise.reject(new Error('Must provide change'));
+  }
+
+  return Array.isArray(idsOrObjects) ? updateMany(db, idsOrObjects, change, prefix) : updateOne(db, idsOrObjects, change, prefix);
+}
+
+/**
  * This is a thin wrapper over the PouchDB API to automatically
  * handle id and timestamps.
  */
 var pleaseInit = function pleaseInit() {
   var api = {
-    pleaseAdd: add$1$1
+    pleaseAdd: add$1$1,
+    pleaseClear: clear,
+    pleaseFindAll: findAll,
+    pleaseFind: find,
+    pleaseRemoveAll: removeAll,
+    pleaseRemove: remove$1$1,
+    pleaseUpdate: update$1
   };
 
   return api;
@@ -24099,7 +24454,7 @@ var StyleGuide = {
 };
 
 /**
-  * vue-router v2.2.1
+  * vue-router v2.3.1
   * (c) 2017 Evan You
   * @license MIT
   */
@@ -25994,9 +26349,11 @@ var HTML5History = (function (History$$1) {
   HTML5History.prototype.push = function push (location, onComplete, onAbort) {
     var this$1 = this;
 
+    var ref = this;
+    var fromRoute = ref.current;
     this.transitionTo(location, function (route) {
       pushState(cleanPath(this$1.base + route.fullPath));
-      handleScroll(this$1.router, route, this$1.current, false);
+      handleScroll(this$1.router, route, fromRoute, false);
       onComplete && onComplete(route);
     }, onAbort);
   };
@@ -26004,9 +26361,11 @@ var HTML5History = (function (History$$1) {
   HTML5History.prototype.replace = function replace (location, onComplete, onAbort) {
     var this$1 = this;
 
+    var ref = this;
+    var fromRoute = ref.current;
     this.transitionTo(location, function (route) {
       replaceState(cleanPath(this$1.base + route.fullPath));
-      handleScroll(this$1.router, route, this$1.current, false);
+      handleScroll(this$1.router, route, fromRoute, false);
       onComplete && onComplete(route);
     }, onAbort);
   };
@@ -26368,7 +26727,7 @@ function createHref (base, fullPath, mode) {
 }
 
 VueRouter.install = install$1;
-VueRouter.version = '2.2.1';
+VueRouter.version = '2.3.1';
 
 if (inBrowser$2 && window.Vue) {
   window.Vue.use(VueRouter);

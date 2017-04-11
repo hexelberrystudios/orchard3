@@ -9,7 +9,7 @@ import toId from '../utils/to-id'
  * @return {Promise}
  */
 function findOne (db, idOrObject, prefix) {
-  const id = toId(idOrObject)
+  let id = toId(idOrObject)
 
   // add prefix if it's not included in the id already
   if (prefix && id.substr(0, prefix.length) !== prefix) {

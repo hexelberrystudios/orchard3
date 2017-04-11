@@ -9,6 +9,8 @@ import isntDesignDoc from './utils/isnt-design-doc'
  * @return {Promise}
  */
 function findAll (filter, prefix) {
+  const db = this
+  
   let options = {
     include_docs: true
   }
@@ -18,7 +20,7 @@ function findAll (filter, prefix) {
     options.endkey = prefix + '\uffff'
   }
 
-  return state.db.allDocs(options)
+  return db.allDocs(options)
     .then(function (res) {
       let objects = res.rows
         .filter(isntDesignDoc)

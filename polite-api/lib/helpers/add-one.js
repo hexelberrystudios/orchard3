@@ -1,5 +1,5 @@
-import uuid from 'uuid'
 import assign from '../utils/assign'
+import uuid from 'uuid'
 import addTimestamps from '../utils/add-timestamps'
 
 /**
@@ -30,11 +30,12 @@ function addOne (db, doc, prefix) {
 
   // add createdAt/updatedAt timestamps
   doc = addTimestamps(doc)
-  return db.put(doc)
+  return db.put()
     .then(function (response) {
       // make sure to include the latest id and revision information
       doc._id = response.id
       doc._rev = response.rev
+      
       return doc
     })
     .catch(function (error) {
