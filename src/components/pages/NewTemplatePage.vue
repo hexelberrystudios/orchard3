@@ -24,7 +24,7 @@
   import AddItemButton from '../AddItemButton.vue'
   import TextField from '../fields/edit/TextField.vue'
   import SubmitButton from '../SubmitButton.vue'
-  import DB from '../../db/db.js'
+  import DB from '../../db/db'
   
   export default {
     name: 'new-template-page',
@@ -72,11 +72,13 @@
         db.pleaseAdd({
             templateName: name,
             fields: fields
-          }).then(function (resp) {
+          })
+          .then(function (resp) {
             console.log(resp)
             // redirect to the home page when finished
             self.$router.push('/app/home')
-          }).catch(function (err) {
+          })
+          .catch(function (err) {
             console.log(err)
           })
       },

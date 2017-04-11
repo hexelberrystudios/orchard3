@@ -30,6 +30,7 @@
   import AddItemButton from '../AddItemButton.vue'
   import TextField from '../fields/edit/TextField.vue'
   import SubmitButton from '../SubmitButton.vue'
+  import DB from '../../db/db'
   
   export default {
     name: 'edit-template-page-2',
@@ -84,7 +85,8 @@
       editTemplate: function (e) {
         let name,
           field,
-          idx;
+          idx,
+          db;
         let fields = [];
         let form = this.$store.state.form.fields;
         let self = this;
@@ -111,37 +113,36 @@
             }
           }
         }
-
-        hoodie.ready.then(function () {
-          if (hoodie.account.isSignedIn()) {
-            self.template.templateName = name;
-            self.template.fields = fields;
-            hoodie.store.update(self.template);
+        
+        db = DB.get()
+        db.pleaseUpdate(self.template)
+          .then(function (resp) {
+            console.log(resp);
             // redirect to the home page when finished
             self.$router.push('/app/home');
-          } else {
-            throw new Error('User is not currently signed in.');
-          }
-        });
+          }).catch(function (error) {
+            console.log(error)
+          });
       },
       removeField: function (fieldIndex) {
         console.log('Calling removeField in EditTemplatePage on index ' + fieldIndex);
         this.$store.dispatch('fields/removeField', fieldIndex);
       },
       deleteTemplate: function (e) {
+        let db;
         let self = this;
         
         e.preventDefault();
         
-        hoodie.ready.then(function () {
-          if (hoodie.account.isSignedIn()) {
-            hoodie.store.remove(self.template.id);
+        db = DB.get()
+        db.pleaseRemove(self.template.id)
+          .then(function (resp) {
+            console.log(resp);
             // redirect to the home page when finished
             self.$router.push('/app/home');
-          } else {
-            throw new Error('User is not currently signed in.');
-          }
-        });
+          }).catch(function (error) {
+            console.log(error)
+          })
       }
     },
     components: {

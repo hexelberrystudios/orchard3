@@ -12,8 +12,8 @@ import isntDesignDoc from '../utils/isnt-design-doc'
 function updateAll (changedProperties, prefix) {
   let docs
   const db = this
-  const type = typeof changedProperties,
-    options = {
+  const type = typeof changedProperties
+  const options = {
       include_docs: true
     }
 
@@ -39,12 +39,12 @@ function updateAll (changedProperties, prefix) {
       if (type === 'function') {
         docs.forEach(changedProperties)
         return docs
+      } else {
+        return docs.map(function (doc) {
+          assign(doc, changedProperties, { _id: doc._id, _rev: doc._rev })
+          return doc
+        })
       }
-
-      return docs.map(function (doc) {
-        assign(doc, changedProperties, { _id: doc._id, _rev: doc._rev })
-        return doc
-      })
     })
     .then(function (result) {
       return result

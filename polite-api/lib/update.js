@@ -5,7 +5,7 @@ import updateMany from './helpers/update-many'
  * Updates existing object.
  * 
  * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
- * @param  {Function|Object} {REQUIRED} change       Changed properties or function that alters passed doc
+ * @param  {Function|Object} {OPTIONAL} change       Changed properties or function that alters passed doc
  * @param  {String}          {OPTIONAL} prefix       Optional id prefix
  * @return {Promise}
  */

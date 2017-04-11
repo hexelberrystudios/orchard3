@@ -24,6 +24,7 @@
   import AppHeader from '../AppHeader.vue'
   import DisplayFieldMorpher from '../fields/display/DisplayFieldMorpher.vue'
   import SubmitButton from '../SubmitButton.vue'
+  import DB from '../../db/db'
   
   export default {
     name: 'item-page',
@@ -43,19 +44,20 @@
     },
     methods: {
       deleteItem: function (e) {
+        let db;
         let self = this;
         
         e.preventDefault();
         
-        hoodie.ready.then(function () {
-          if (hoodie.account.isSignedIn()) {
-            hoodie.store.remove(self.item.id);
+        db = DB.get();
+        db.pleaseRemove(self.item.id)
+          .then(function (resp) {
+            console.log(resp);
             // redirect to the home page when finished
             self.$router.push('/app/home');
-          } else {
-            throw new Error('User is not currently signed in.');
-          }
-        });
+          }).catch(function (error) {
+            console.log(error)
+          });
       }
     },
     components: {

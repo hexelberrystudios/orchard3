@@ -22,6 +22,7 @@
   import AppHeader from '../AppHeader.vue'
   import FieldMorpher from '../fields/edit/FieldMorpher.vue'
   import SubmitButton from '../SubmitButton.vue'
+  import DB from '../../db/db'
   
   export default {
     name: 'edit-item-page',
@@ -37,10 +38,11 @@
     mounted: function () {
       let self = this
       // load item to be edited
-      this.$store.dispatch('items/getItem', this.$route.params.itemId).then(function () {
-        // fill form fields with item's stored field values
-        self.loadForm()
-      })
+      this.$store.dispatch('items/getItem', this.$route.params.itemId)
+        .then(function () {
+          // fill form fields with item's stored field values
+          self.loadForm()
+        })
     },
     computed: {
       ...mapGetters({
@@ -63,6 +65,7 @@
       },
       editItem: function (e) {
         let i,
+          db,
           field;
         let self = this;
         let form = this.$store.state.form.fields;
@@ -79,15 +82,15 @@
           }
         }
         
-        hoodie.ready.then(function () {
-          if (hoodie.account.isSignedIn()) {
-            hoodie.store.update(self.item);
+        db = DB.get();
+        db.pleaseUpdate(self.item)
+          .then(function (resp) {
+            console.log(resp);
             // redirect to the home page when finished
             self.$router.push('/app/home');
-          } else {
-            throw new Error('User is not currently signed in.');
-          }
-        });
+          }).catch(function (error) {
+            console.log(error)
+          })
       }
     },
     components: {

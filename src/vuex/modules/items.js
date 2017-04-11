@@ -1,3 +1,5 @@
+import DB from '../../db/db'
+
 const itemModule = {
   // namespace this module so that it doesn't collide with other store behavior
   namespaced: true, // -> getters['items/*']
@@ -23,14 +25,10 @@ const itemModule = {
   actions: {
     getItems: ({ commit, state }) => {
       const findAllItems = function (resolve, reject) {
+        let db = DB.get()
         // look through the DB for all the items
-        /*
-        hoodie.store.findAll()
-          .then((docs) => {
-            console.log(docs)
-            return docs.filter(doc => doc.isItem) // only include docs where isItem is true
-          })
-          .then((itemDocs) => {
+        db.pleaseFindAll(doc => doc.isItem)
+          .then(function (itemDocs) {
             console.log('ITEMS FOUND:')
             console.log(itemDocs)
             // update the store with the list of available items
@@ -41,16 +39,15 @@ const itemModule = {
             console.log(error)
             reject(error)
           })
-        */
       }
               
       return null
     },
     getItem: ({ commit, state }, id) => {
       const findItem = function (resolve, reject) {
+        let db = DB.get()
         // look through the DB for all the items
-        /*
-        hoodie.store.find(id)
+        db.pleaseFind(id)
           .then((itemDoc) => {
             // update the store with the list of available items
             commit('ACTIVE_ITEM', itemDoc)
@@ -60,25 +57,16 @@ const itemModule = {
             console.log(error)
             reject(error)
           })
-        */
       }
       
       return null
     },
     getToDoItems: ({ commit, state }) => {
       const findAllToDoItems = function (resolve, reject) {
+        let db = DB.get()
         // look through the DB for all the items
-        /*
-        hoodie.store.findAll()
-          .then((docs) => {
-            console.log(docs)
-            return docs.filter(function (doc) {
-              const completableFields = doc.fields.filter(function (field) {
-                return field.fieldType === 'CompletableField'
-              })
-              
-              return doc.isItem && completableFields.length
-            }) // only include docs where isItem is true
+        db.pleaseFindAll(function (field) {
+            return field.fieldType === 'CompletableField'
           })
           .then((itemDocs) => {
             console.log('TO DO ITEMS FOUND:')
@@ -161,7 +149,6 @@ const itemModule = {
             console.log(error)
             reject(error)
           })
-          */
       }
       
       return null

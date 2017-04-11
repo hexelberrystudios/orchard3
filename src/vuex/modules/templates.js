@@ -1,3 +1,5 @@
+import DB from '../../db/db'
+
 const templateModule = {
   // namespace this module so that it doesn't collide with other store behavior
   namespaced: true, // -> getters['templates/*']
@@ -23,12 +25,9 @@ const templateModule = {
   actions: {
     getTemplates: ({ commit, state }) => {
       const findAllTemplates = function (resolve, reject) {
+        let db = DB.get()
         // look through the DB for all the templates
-        /*
-        hoodie.store.findAll()
-          .then((docs) => {
-            return docs.filter(function (doc) { return doc.templateName && !doc.isItem }) // filter out docs that have no templateName field
-          })
+        db.pleaseFindAll((doc) => doc.templateName && !doc.isItem)
           .then((templateDocs) => {
             console.log('done loading templates')
             console.log(templateDocs)
@@ -40,16 +39,15 @@ const templateModule = {
             console.log(error)
             reject(error)
           })
-        */
       }
       
       return null
     },
     getTemplate: ({ commit, state }, id) => {
       const findTemplate = function (resolve, reject) {
+        let db = DB.get()
         // look through the DB for all the items
-        /*
-        hoodie.store.find(id)
+        db.pleaseFind(id)
           .then((templateDoc) => {
             // update the store with the list of available items
             commit('ACTIVE_TEMPLATE', templateDoc)
@@ -59,7 +57,6 @@ const templateModule = {
             console.log(error)
             reject(error)
           })
-        */
       }
       
       return null

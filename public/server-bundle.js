@@ -7695,1471 +7695,6 @@ var fieldListModule = {
   }
 };
 
-var templateModule = {
-  // namespace this module so that it doesn't collide with other store behavior
-  namespaced: true, // -> getters['templates/*']
-  // default values
-  state: { templates: [{}], activeTemplate: {} },
-  getters: {
-    getTemplates: function getTemplates(state) {
-      return state.templates;
-    },
-    getActiveTemplate: function getActiveTemplate(state) {
-      return state.activeTemplate;
-    }
-  },
-  // directly update the store
-  mutations: {
-    // set template list
-    TEMPLATE_LIST: function TEMPLATE_LIST(state, templates) {
-      state.templates = templates;
-    },
-    // set current template
-    ACTIVE_TEMPLATE: function ACTIVE_TEMPLATE(state, template) {
-      console.log(template);
-      state.activeTemplate = template;
-    }
-  },
-  // update the store event handler
-  actions: {
-    getTemplates: function getTemplates(_ref) {
-      var commit = _ref.commit,
-          state = _ref.state;
-
-      var findAllTemplates = function findAllTemplates(resolve, reject) {
-        // look through the DB for all the templates
-        /*
-        hoodie.store.findAll()
-          .then((docs) => {
-            return docs.filter(function (doc) { return doc.templateName && !doc.isItem }) // filter out docs that have no templateName field
-          })
-          .then((templateDocs) => {
-            console.log('done loading templates')
-            console.log(templateDocs)
-            // update the store with the list of available templates
-            commit('TEMPLATE_LIST', templateDocs)
-            resolve(templateDocs)
-          })
-          .catch((error) => {
-            console.log(error)
-            reject(error)
-          })
-        */
-      };
-
-      return null;
-    },
-    getTemplate: function getTemplate(_ref2, id) {
-      var commit = _ref2.commit,
-          state = _ref2.state;
-
-      var findTemplate = function findTemplate(resolve, reject) {
-        // look through the DB for all the items
-        /*
-        hoodie.store.find(id)
-          .then((templateDoc) => {
-            // update the store with the list of available items
-            commit('ACTIVE_TEMPLATE', templateDoc)
-            resolve(templateDoc)
-          })
-          .catch((error) => {
-            console.log(error)
-            reject(error)
-          })
-        */
-      };
-
-      return null;
-    },
-    setTemplate: function setTemplate(_ref3, template) {
-      var commit = _ref3.commit,
-          state = _ref3.state;
-
-      commit('ACTIVE_TEMPLATE', template);
-    }
-  }
-};
-
-var itemModule = {
-  // namespace this module so that it doesn't collide with other store behavior
-  namespaced: true, // -> getters['items/*']
-  // default values
-  state: { items: [{}], activeItem: {} },
-  getters: {
-    getItems: function getItems(state) {
-      return state.items;
-    },
-    getActiveItem: function getActiveItem(state) {
-      return state.activeItem;
-    }
-  },
-  // directly update the store
-  mutations: {
-    // set item list
-    ITEM_LIST: function ITEM_LIST(state, items) {
-      state.items = items;
-    },
-    // set current item
-    ACTIVE_ITEM: function ACTIVE_ITEM(state, item) {
-      console.log(item);
-      state.activeItem = item;
-    }
-  },
-  // update the store event handler
-  actions: {
-    getItems: function getItems(_ref) {
-      var commit = _ref.commit,
-          state = _ref.state;
-
-      var findAllItems = function findAllItems(resolve, reject) {
-        // look through the DB for all the items
-        /*
-        hoodie.store.findAll()
-          .then((docs) => {
-            console.log(docs)
-            return docs.filter(doc => doc.isItem) // only include docs where isItem is true
-          })
-          .then((itemDocs) => {
-            console.log('ITEMS FOUND:')
-            console.log(itemDocs)
-            // update the store with the list of available items
-            commit('ITEM_LIST', itemDocs)
-            resolve(itemDocs)
-          })
-          .catch((error) => {
-            console.log(error)
-            reject(error)
-          })
-        */
-      };
-
-      return null;
-    },
-    getItem: function getItem(_ref2, id) {
-      var commit = _ref2.commit,
-          state = _ref2.state;
-
-      var findItem = function findItem(resolve, reject) {
-        // look through the DB for all the items
-        /*
-        hoodie.store.find(id)
-          .then((itemDoc) => {
-            // update the store with the list of available items
-            commit('ACTIVE_ITEM', itemDoc)
-            resolve(itemDoc)
-          })
-          .catch((error) => {
-            console.log(error)
-            reject(error)
-          })
-        */
-      };
-
-      return null;
-    },
-    getToDoItems: function getToDoItems(_ref3) {
-      var commit = _ref3.commit,
-          state = _ref3.state;
-
-      var findAllToDoItems = function findAllToDoItems(resolve, reject) {
-        // look through the DB for all the items
-        /*
-        hoodie.store.findAll()
-          .then((docs) => {
-            console.log(docs)
-            return docs.filter(function (doc) {
-              const completableFields = doc.fields.filter(function (field) {
-                return field.fieldType === 'CompletableField'
-              })
-              
-              return doc.isItem && completableFields.length
-            }) // only include docs where isItem is true
-          })
-          .then((itemDocs) => {
-            console.log('TO DO ITEMS FOUND:')
-            console.log(itemDocs)
-            
-            // @TODO: Refactor into configurable system
-            // Sort items date desc
-            itemDocs.sort(function (itemA, itemB) {
-              let dateA,
-                dateB,
-                date,
-                time
-                  
-              // get all relevant fields that have been filled out
-              const dateFieldsA = itemA.fields.filter(function (field) {
-                return field.fieldType === 'DateField' && field.value
-              })
-              const dateFieldsB = itemB.fields.filter(function (field) {
-                return field.fieldType === 'DateField' && field.value
-              })
-              const timeFieldsA = itemA.fields.filter(function (field) {
-                return field.fieldType === 'TimeField' && field.value
-              })
-              const timeFieldsB = itemB.fields.filter(function (field) {
-                return field.fieldType === 'TimeField' && field.value
-              })
-              
-              // we're going to sort by the first date and time field we find,
-              // because how else are we going to do that
-              if (dateFieldsA.length || timeFieldsA.length) {
-                dateA = new Date()
-              }
-              if (dateFieldsA.length) {
-                date = dateFieldsA[0].value.split('-')
-                dateA.setYear(date[0])
-                dateA.setMonth(date[1])
-                dateA.setDate(date[2])
-              }
-              if (timeFieldsA.length) {
-                time = timeFieldsA[0].value.split(':')
-                dateA.setHours(time[0])
-                dateA.setMinutes(time[1])
-              }
-              
-              if (dateFieldsB.length || timeFieldsB.length) {
-                dateB = new Date()
-              }
-              if (dateFieldsB.length) {
-                date = dateFieldsB[0].value.split('-')
-                dateB.setYear(date[0])
-                dateB.setMonth(date[1])
-                dateB.setDate(date[2])
-              }
-              if (timeFieldsB.length) {
-                time = timeFieldsB[0].value.split(':')
-                dateB.setHours(time[0])
-                dateB.setMinutes(time[1])
-              }
-              
-              // sort by date desc
-              if (dateA && dateB) {
-                return dateB.getTime() - dateA.getTime()
-              } else if (dateA) {
-                // A < B
-                return -1
-              } else if (dateB) {
-                // A > B
-                return 1
-              } else {
-                // Neither have dates, so they're equal
-                return 0
-              }
-            })
-            
-            // update the store with the list of available items
-            commit('ITEM_LIST', itemDocs)
-            resolve(itemDocs)
-          })
-          .catch((error) => {
-            console.log(error)
-            reject(error)
-          })
-          */
-      };
-
-      return null;
-    },
-    setItem: function setItem(_ref4, item) {
-      var commit = _ref4.commit,
-          state = _ref4.state;
-
-      commit('ACTIVE_ITEM', item);
-    }
-  }
-};
-
-Vue$2$1.use(index_esm);
-
-var defaultState = {
-  topics: [],
-  count: 0
-};
-
-var inBrowser$1 = typeof window !== 'undefined';
-
-// if in browser, use pre-fetched state injected by SSR
-var state$1 = inBrowser$1 && window.__INITIAL_STATE__ || defaultState;
-
-var mutations = {
-  TOPICS_LIST: function TOPICS_LIST(state, topics) {
-    state.topics = topics;
-  },
-
-  INCREMENT: function INCREMENT(state) {
-    state.count++;
-  },
-
-  DECREMENT: function DECREMENT(state) {
-    state.count--;
-  }
-};
-
-var store = new index_esm.Store({
-  state: state$1,
-  actions: actions,
-  mutations: mutations,
-  getters: getters,
-  modules: {
-    form: formModule,
-    fields: fieldListModule,
-    items: itemModule,
-    templates: templateModule
-  }
-});
-
-var __dirname = '/home/ubuntu/workspace/src/router';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-};
-
-/*
- * This is a text field. It can be of type text, email, password, etc.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this text field.
- * @param {STRING} {REQUIRED} label       The label for this text field.
- * @param {STRING} {OPTIONAL} type        The type of input field this will be. (text, password, email, etc.)
- * @param {STRING} {OPTIONAL} placeholder The placeholder attribute for this text field.
- */
-
-var TextField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": _vm.type, "name": _vm.id, "placeholder": _vm.placeholder }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
-  },
-  staticRenderFns: [],
-  name: 'text-field',
-  methods: {
-    update: function update(e) {
-      // tell action in form vuex module to update its form field with the following key/value pair
-      this.$store.dispatch('form/updateField', {
-        name: this.id,
-        value: e.target.value
-      });
-    }
-  },
-  computed: _extends({}, mapState({
-    value: function value(state) {
-      return state.form.fields[this.id];
-    }
-  })),
-  // define the props that can be passed in, to differentiate local variables versus arguments I guess
-  props: {
-    id: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    },
-    type: {
-      type: String,
-      default: 'text',
-      required: false
-    },
-    placeholder: {
-      type: String,
-      required: false
-    }
-  }
-};
-
-var SubmitButton = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('button', { staticClass: "hxb-button", attrs: { "type": "submit" } }, [_vm._v(_vm._s(_vm.text))]);
-  },
-  staticRenderFns: [],
-  name: 'submit-button',
-  props: {
-    text: {
-      type: String,
-      required: true
-    }
-  }
-};
-
-var LoginForm = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('form', { staticClass: "hxb-form", attrs: { "name": "login", "method": "post", "action": "/app/login" }, on: { "submit": _vm.login } }, [_c('text-field', { attrs: { "id": "username", "label": "username", "type": "text", "placeholder": "username" } }), _vm._v(" "), _c('text-field', { attrs: { "id": "password", "label": "password", "type": "password", "placeholder": "password" } }), _vm._v(" "), _c('submit-button', { attrs: { "text": "Login" } }), _vm._v(" "), _c('router-link', { attrs: { "to": "/app/register", "exact": "" } }, [_vm._v("or Register")])], 1);
-  },
-  staticRenderFns: [],
-  name: 'login-form',
-  created: function created() {
-    this.$store.dispatch('form/resetForm');
-  },
-
-  methods: {
-    login: function login(e) {
-      var self = this,
-          username = self.$store.state.form.fields.username,
-          password = self.$store.state.form.fields.password;
-      e.preventDefault();
-
-      // @TODO: ajax call to login, where the server will return the user's db url
-      // for us to sync with
-      self.$router.push('/app/home');
-    }
-  },
-  components: {
-    TextField: TextField,
-    SubmitButton: SubmitButton
-  }
-};
-
-var LoginPage = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('article', [_vm._m(0), _vm._v(" "), _c('login-form')], 1);
-  },
-  staticRenderFns: [function () {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('header', [_c('h1', { staticClass: "hxb-u-txt-center" }, [_vm._v("Hexelberry Orchard")])]);
-  }],
-  name: 'login-page',
-  // List the components used on this page. This is using ES2015 syntax,
-  // where PrimaryButton is the same as 'PrimaryButton': PrimaryButton
-  components: {
-    LoginForm: LoginForm
-  }
-};
-
-var RegisterForm = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('form', { staticClass: "hxb-form", attrs: { "name": "register", "method": "post", "action": "/app/register" }, on: { "submit": _vm.register } }, [_c('text-field', { attrs: { "id": "username", "label": "username", "type": "text", "placeholder": "username" } }), _vm._v(" "), _c('text-field', { attrs: { "id": "password", "label": "password", "type": "password", "placeholder": "password" } }), _vm._v(" "), _c('submit-button', { attrs: { "text": "Register" } })], 1);
-  },
-  staticRenderFns: [],
-  name: 'register-form',
-  created: function created() {
-    this.$store.dispatch('form/resetForm');
-  },
-
-  methods: {
-    register: function register(e) {
-      var self = this,
-          username = self.$store.state.form.fields.username,
-          password = self.$store.state.form.fields.password;
-      e.preventDefault();
-
-      // @TODO: ajax call to register, where CouchDB url will be created, and the url
-      // to sync with will be returned. Prerequisite: Authorization token for signing up for premium.
-      self.$router.push('/app/home');
-    }
-  },
-  components: {
-    TextField: TextField,
-    SubmitButton: SubmitButton
-  }
-};
-
-var RegisterPage = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_vm._m(0), _vm._v(" "), _c('register-form')], 1);
-  },
-  staticRenderFns: [function () {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('header', [_c('h1', { staticClass: "hxb-u-txt-center" }, [_vm._v("Hexelberry Orchard")])]);
-  }],
-  name: 'register-page',
-  // List the components used on this page. This is using ES2015 syntax,
-  // where PrimaryButton is the same as 'PrimaryButton': PrimaryButton
-  components: {
-    RegisterForm: RegisterForm
-  }
-};
-
-var AppFooter = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('footer', { staticClass: "hxb-footer" }, [_c('ul', { staticClass: "hxb-footer-list" }, [_c('li', { staticClass: "hxb-footer-list__action" }, [_c('router-link', { attrs: { "to": "/app/todo" } }, [_vm._v("To Do")])], 1), _vm._v(" "), _c('li', { staticClass: "hxb-footer-list__action" }, [_c('router-link', { attrs: { "to": "/app/search" } }, [_vm._v("Search")])], 1), _vm._v(" "), _c('li', { staticClass: "hxb-footer-list__action" }, [_c('router-link', { attrs: { "to": "/app/edit" } }, [_vm._v("Edit")])], 1), _vm._v(" "), _c('li', { staticClass: "hxb-footer-list__action" }, [_c('router-link', { attrs: { "to": "/app/new" } }, [_vm._v("New")])], 1)])]);
-  },
-  staticRenderFns: [],
-  name: 'app-footer'
-};
-
-var AppHeader = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('header', { staticClass: "hxb-header" }, [_c('router-link', { attrs: { "to": "/app/home" } }, [_vm._v("Hexelberry Orchard")])], 1);
-  },
-  staticRenderFns: [],
-  name: 'app-header'
-};
-
-/*
- * This is the output of a text field.
- */
-
-var DisplayTextField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v(_vm._s(_vm.value))]) : _vm._e();
-  },
-  staticRenderFns: [],
-  name: 'display-text-field',
-  props: {
-    value: {
-      type: String,
-      required: false
-    }
-  }
-};
-
-/*
- * This is the output of a text area field.
- */
-
-var DisplayTextAreaField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v(_vm._s(_vm.value))]) : _vm._e();
-  },
-  staticRenderFns: [],
-  name: 'display-textarea-field',
-  props: {
-    value: {
-      type: String,
-      required: false
-    }
-  }
-};
-
-/*
- * This is the output of a date field.
- * 
- * @TODO: How do we set up preferred date display?
- */
-
-var DisplayDateField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v(_vm._s(_vm.value))]) : _vm._e();
-  },
-  staticRenderFns: [],
-  name: 'display-date-field',
-  props: {
-    value: {
-      type: String,
-      required: false
-    }
-  }
-};
-
-/*
- * This is the output of a time field.
- * 
- * @TODO: Right now it displays in military time. How do we setup option for preferred time display?
- */
-
-var DisplayTimeField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v(_vm._s(_vm.value))]) : _vm._e();
-  },
-  staticRenderFns: [],
-  name: 'display-time-field',
-  props: {
-    value: {
-      type: String,
-      required: false
-    }
-  }
-};
-
-/*
- * This is the output of a completable field.
- * 
- */
-
-var DisplayCompletableField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v("Completed")]) : _c('p', [_vm._v("Incomplete")]);
-  },
-  staticRenderFns: [],
-  name: 'display-completable-field',
-  props: {
-    value: {
-      type: Boolean,
-      required: false
-    }
-  }
-};
-
-/*
- * This is the output of a time since field.
- */
-
-var DisplayTimeSinceField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('p', [_vm._v(_vm._s(_vm.displayValue))]);
-  },
-  staticRenderFns: [],
-  name: 'display-time-since-field',
-  computed: {
-    // @TODO: Refactor into utility fn (or likely replace with a date library)
-    displayValue: function displayValue(state) {
-      var days = void 0,
-          hours = void 0,
-          minutes = void 0,
-          seconds = void 0;
-      var latestDate = this.value;
-
-      if (latestDate) {
-        // looks like it gets saved as a string, so convert to date
-        latestDate = new Date(latestDate);
-
-        // time difference in ms
-        var timeDiff = new Date().getTime() - latestDate;
-
-        // strip the ms
-        timeDiff /= 1000;
-
-        // get seconds
-        seconds = Math.round(timeDiff % 60);
-
-        // remove seconds from the date
-        timeDiff = Math.floor(timeDiff / 60);
-
-        // get minutes
-        minutes = Math.round(timeDiff % 60);
-
-        // remove minutes from the date
-        timeDiff = Math.floor(timeDiff / 60);
-
-        // get hours
-        hours = Math.round(timeDiff % 24);
-
-        // remove hours from the date
-        timeDiff = Math.floor(timeDiff / 24);
-
-        // the rest of timeDiff is number of days
-        days = timeDiff;
-      } else {
-        days = 0;
-        hours = 0;
-        minutes = 0;
-        seconds = 0;
-      }
-
-      return days + 'd:' + hours + 'h:' + minutes + 'm:' + seconds + 's';
-    }
-  },
-  props: {
-    value: {
-      required: false
-    }
-  }
-};
-
-/**
- * This component will morph into the given field.
- * NOTE: Remember to update this component with all relevant properties from possible fields,
- * so the properties can be properly bound.
- */
-var DisplayFieldMorpher = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('Display' + _vm.field.fieldType, { tag: "component", attrs: { "value": _vm.field.value } });
-  },
-  staticRenderFns: [],
-  name: 'display-field-morpher',
-  props: {
-    field: {
-      type: Object,
-      required: true
-    }
-  },
-  components: {
-    DisplayTextField: DisplayTextField,
-    DisplayTextAreaField: DisplayTextAreaField,
-    DisplayDateField: DisplayDateField,
-    DisplayTimeField: DisplayTimeField,
-    DisplayCompletableField: DisplayCompletableField,
-    DisplayTimeSinceField: DisplayTimeSinceField
-  }
-};
-
-var DisplayItem = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('section', { staticClass: "hxb-object-list-item" }, [_c('router-link', { staticClass: "hxb-object-list-item__link", attrs: { "to": _vm.itemPath + _vm.item.id } }, [_vm._l(_vm.item.fields, function (field) {
-      return field.showInPreview === 'yes' ? [_c('display-field-morpher', { attrs: { "field": field } })] : _vm._e();
-    })], 2)], 1);
-  },
-  staticRenderFns: [],
-  name: 'display-item',
-  data: function data() {
-    return {
-      itemPath: '/app/item/'
-    };
-  },
-  components: {
-    DisplayFieldMorpher: DisplayFieldMorpher
-  },
-  props: {
-    item: {
-      type: Object,
-      required: true
-    }
-  }
-};
-
-/**
- * Shows a list of items and bundles for the current bundle directory.
- *
- * @TODO: Replace items with data pulled from DB.
- *
- * @param {STRING} {REQUIRED} path The bundle path to display.
- */
-
-var fetchInitialData = function fetchInitialData(store) {
-  return store.dispatch('items/getItems');
-};
-
-var ItemDirectory = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('article', { staticClass: "hxb-object-list" }, [_vm._l(_vm.items, function (item) {
-      return [_c('display-item', { attrs: { "item": item } })];
-    })], 2);
-  },
-  staticRenderFns: [],
-  name: 'item-directory',
-  computed: _extends({}, mapGetters({
-    items: 'items/getItems'
-  })),
-  mounted: function mounted() {
-    fetchInitialData(this.$store);
-  },
-
-  components: {
-    DisplayItem: DisplayItem
-  },
-  props: {
-    path: {
-      type: String,
-      required: true
-    }
-  }
-};
-
-var HomePage = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('item-directory', { attrs: { "path": "/" } }), _vm._v(" "), _c('app-footer')], 1);
-  },
-  staticRenderFns: [],
-  name: 'home-page',
-  components: {
-    AppFooter: AppFooter,
-    AppHeader: AppHeader,
-    ItemDirectory: ItemDirectory
-  }
-};
-
-/*
- * An object list is one that lists items.
- *
- * choices {ARRAY} - [{ link: 'string', label: 'string' }, ...]
- */
-var ObjectList = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('ul', { staticClass: "hxb-object-list", class: { 'is-indented': _vm.isIndented } }, _vm._l(_vm.objects, function (object) {
-      return object.link && object.label ? _c('li', { staticClass: "hxb-object-list-item" }, [_c('router-link', { staticClass: "hxb-object-list-item__link", attrs: { "to": object.link } }, [_c('span', [_vm._v(_vm._s(object.label))]), _vm._v(" "), _c('span', { staticClass: "hxb-object-list-item__arrow" }, [_vm._v("⇢")])])], 1) : _vm._e();
-    }));
-  },
-  staticRenderFns: [],
-  name: 'object-list',
-  props: {
-    objects: {
-      type: Array,
-      required: true
-    },
-    isIndented: {
-      type: Boolean,
-      required: false
-    }
-  }
-};
-
-var NewPage = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("Time to make a new...")]), _vm._v(" "), _c('object-list', { attrs: { "objects": _vm.objects, "is-indented": _vm.isIndented } }), _vm._v(" "), _c('app-footer')], 1);
-  },
-  staticRenderFns: [],
-  name: 'new-page',
-  data: function data() {
-    return {
-      objects: [{
-        label: 'Item',
-        link: '/app/new-item'
-      }, {
-        label: 'Template',
-        link: '/app/new-template'
-      }, {
-        label: 'Bundle',
-        link: '/app/new-bundle'
-      }],
-      isIndented: true
-    };
-  },
-  components: {
-    AppHeader: AppHeader,
-    AppFooter: AppFooter,
-    ObjectList: ObjectList
-  }
-};
-
-/*
- * This is a text field. It can be of type text, email, password, etc.
- *
- * @param {STRING} {REQUIRED} id       The id and name of this text field.
- * @param {STRING} {REQUIRED} label    The label for this text field.
- * @param {ARRAY}  {REQUIRED} options  An array containing the list of options, given in the format [{ label: 'string', value: 'string' }, ...]
- */
-var DropdownField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { directives: [{ name: "model", rawName: "v-model", value: _vm.value, expression: "value" }], staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": [function ($event) {
-          var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-            return o.selected;
-          }).map(function (o) {
-            var val = "_value" in o ? o._value : o.value;return val;
-          });_vm.value = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
-        }, _vm.update] } }, _vm._l(_vm.options, function (option) {
-      return _c('option', { domProps: { "value": option.value } }, [_vm._v(_vm._s(option.label))]);
-    }))]);
-  },
-  staticRenderFns: [],
-  name: 'dropdown-field',
-  methods: {
-    update: function update(e) {
-      // tell action in form vuex module to update its form field with the following key/value pair
-      this.$store.dispatch('form/updateField', {
-        name: this.id,
-        value: e.target.value
-      });
-    },
-    isSelected: function isSelected(value) {
-      return this.value === value;
-    }
-  },
-  computed: _extends({}, mapState({
-    value: function value(state) {
-      return state.form.fields[this.id] || '';
-    }
-  })),
-  props: {
-    id: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    },
-    options: {
-      type: Array,
-      required: true
-    }
-  }
-};
-
-var fetchInitialData$1 = function fetchInitialData(store) {
-  return store.dispatch('templates/getTemplates');
-};
-
-var NewItemPageStep1 = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), !_vm.areTemplatesLoaded() ? _c('h1', { staticClass: "hxb-u-pdl-1 hxb-u-txt-center" }, [_vm._v("Loading...")]) : _vm._e(), _vm._v(" "), _vm.templates.length > 0 ? _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("What would you like to organize today?")]) : _vm._e(), _vm._v(" "), _vm.templates.length > 0 ? _c('form', { staticClass: "hxb-form", attrs: { "name": "set_template", "method": "POST", "action": "/app/new-item-page-2" }, on: { "submit": _vm.setTemplate } }, [_c('dropdown-field', { attrs: { "id": "template", "label": "Select a template", "options": _vm.templateOptions } }), _vm._v(" "), _c('div', { staticClass: "hxb-form-field" }, [_c('submit-button', { attrs: { "text": "Save" } })], 1)], 1) : _vm._e(), _vm._v(" "), _vm.areTemplatesLoaded() && _vm.templates.length === 0 ? _c('h1', { staticClass: "hxb-u-pdl-1 hxb-u-txt-center" }, [_vm._v("No templates found. Please make a template first.")]) : _vm._e(), _vm._v(" "), _c('app-footer')], 1);
-  },
-  staticRenderFns: [],
-  name: 'new-item-page-1',
-  prefetch: fetchInitialData$1,
-  computed: _extends({}, mapGetters({
-    templates: 'templates/getTemplates'
-  }), {
-    templateOptions: function templateOptions() {
-      var i = void 0,
-          template = void 0;
-      var templates = this.templates;
-      var templateList = [{
-        label: '-- please select one --',
-        value: ''
-      }];
-
-      for (i = 0; i < templates.length; i++) {
-        template = templates[i];
-        templateList.push({
-          label: template.templateName,
-          value: template.id
-        });
-      }
-
-      return templateList;
-    }
-  }),
-  created: function created() {
-    this.$store.dispatch('form/resetForm');
-  },
-  mounted: function mounted() {
-    fetchInitialData$1(this.$store);
-  },
-
-  methods: {
-    areTemplatesLoaded: function areTemplatesLoaded() {
-      return Array.isArray(this.templateOptions);
-    },
-    setTemplate: function setTemplate(e) {
-      var i = void 0,
-          template = void 0;
-      var templateId = this.$store.state.form.fields['template'];
-
-      e.preventDefault();
-
-      for (i = 0; i < this.templates.length; i++) {
-        if (this.templates[i].id === templateId) {
-          template = this.templates[i];
-          break;
-        }
-      }
-
-      this.$store.dispatch('templates/setTemplate', template);
-      this.$router.push('/app/new-item-page-2');
-    }
-  },
-  components: {
-    AppHeader: AppHeader,
-    AppFooter: AppFooter,
-    DropdownField: DropdownField,
-    SubmitButton: SubmitButton
-  }
-};
-
-var TextAreaField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('textarea', { staticClass: "hxb-input-field", attrs: { "id": _vm.id, "name": _vm.id, "placeholder": _vm.placeholder, "rows": "10", "cols": "50" }, on: { "input": _vm.update } }, [_vm._v(_vm._s(_vm.value))])]);
-  },
-  staticRenderFns: [],
-  name: 'textarea-field',
-  methods: {
-    update: function update(e) {
-      // tell action in form vuex module to update its form field with the following key/value pair
-      this.$store.dispatch('form/updateField', {
-        name: this.id,
-        value: e.target.value
-      });
-    }
-  },
-  computed: _extends({}, mapState({
-    value: function value(state) {
-      return state.form.fields[this.id];
-    }
-  })),
-  props: {
-    id: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    },
-    placeholder: {
-      type: String,
-      required: false
-    }
-  }
-};
-
-/*
- * This is a date field.
- * 
- * @TODO: Add datepicker.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this date field.
- * @param {STRING} {REQUIRED} label       The label for this date field.
- */
-
-var DateField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": "date", "name": _vm.id, "placeholder": "yyyy-mm-dd" }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
-  },
-  staticRenderFns: [],
-  name: 'date-field',
-  methods: {
-    update: function update(e) {
-      // tell action in form vuex module to update its form field with the following key/value pair
-      this.$store.dispatch('form/updateField', {
-        name: this.id,
-        value: e.target.value
-      });
-    }
-  },
-  computed: _extends({}, mapState({
-    value: function value(state) {
-      return state.form.fields[this.id];
-    }
-  })),
-  // define the props that can be passed in, to differentiate local variables versus arguments I guess
-  props: {
-    id: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    }
-  }
-};
-
-/*
- * This is a time field.
- * 
- * @TODO: Add time picker, figure out time zones.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this field.
- * @param {STRING} {REQUIRED} label       The label for this field.
- */
-
-var TimeField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": "time", "name": _vm.id, "placeholder": "HH:MM" }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
-  },
-  staticRenderFns: [],
-  name: 'time-field',
-  methods: {
-    update: function update(e) {
-      // tell action in form vuex module to update its form field with the following key/value pair
-      this.$store.dispatch('form/updateField', {
-        name: this.id,
-        value: e.target.value
-      });
-    }
-  },
-  computed: _extends({}, mapState({
-    value: function value(state) {
-      return state.form.fields[this.id];
-    }
-  })),
-  // define the props that can be passed in, to differentiate local variables versus arguments I guess
-  props: {
-    id: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    }
-  }
-};
-
-var CheckboxField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('input', { staticClass: "hxb-checkbox", attrs: { "id": _vm.id, "type": "checkbox", "name": _vm.id }, domProps: { "checked": _vm.value }, on: { "change": _vm.update } }), _vm._v(" "), _c('label', { staticClass: "hxb-checkbox-label", attrs: { "for": _vm.id } }, [_vm._v("\n    " + _vm._s(_vm.label) + "\n  ")])]);
-  },
-  staticRenderFns: [],
-  name: 'checkbox-field',
-  methods: {
-    update: function update(e) {
-      // tell action in form vuex module to update its form field with the following key/value pair
-      this.$store.dispatch('form/updateField', {
-        name: this.id,
-        value: e.target.checked
-      });
-    }
-  },
-  computed: _extends({}, mapState({
-    value: function value(state) {
-      return state.form.fields[this.id];
-    }
-  })),
-  props: {
-    id: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    }
-  }
-};
-
-var CompletableField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('checkbox-field', { attrs: { "id": _vm.id, "label": _vm.label } });
-  },
-  staticRenderFns: [],
-  name: 'completable-field',
-  props: {
-    id: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    }
-  },
-  components: {
-    CheckboxField: CheckboxField
-  }
-};
-
-/*
- * This is a time since field. This shows the amount of time that has elapsed
- * since the time has been reset.
- * 
- * @TODO: Add datepicker.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this date field.
- * @param {STRING} {REQUIRED} label       The label for this date field.
- */
-
-var TimeSinceField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('span', { staticClass: "hxb-u-display-block" }, [_vm._v(_vm._s(_vm.value))]), _vm._v(" "), _c('button', { staticClass: "hxb-button", attrs: { "type": "button" }, on: { "click": _vm.resetTime } }, [_vm._v("Reset")])]);
-  },
-  staticRenderFns: [],
-  name: 'date-field',
-  methods: {
-    resetTime: function resetTime(e) {
-      // tell action in form vuex module to update its form field with the following key/value pair
-      this.$store.dispatch('form/updateField', {
-        name: this.id,
-        value: new Date()
-      });
-    }
-  },
-  mounted: function mounted() {
-    this.$store.dispatch('form/updateField', {
-      name: this.id,
-      value: new Date()
-    });
-  },
-  computed: _extends({}, mapState({
-    // @TODO: Refactor into utility fn (or likely replace with a date library)
-    value: function value(state) {
-      var days = void 0,
-          hours = void 0,
-          minutes = void 0,
-          seconds = void 0;
-      var latestDate = state.form.fields[this.id];
-
-      if (latestDate) {
-        // looks like it gets saved as a string, so convert to date
-        latestDate = new Date(latestDate);
-
-        // time difference in ms
-        var timeDiff = new Date().getTime() - latestDate;
-
-        // strip the ms
-        timeDiff /= 1000;
-
-        // get seconds
-        seconds = Math.round(timeDiff % 60);
-
-        // remove seconds from the date
-        timeDiff = Math.floor(timeDiff / 60);
-
-        // get minutes
-        minutes = Math.round(timeDiff % 60);
-
-        // remove minutes from the date
-        timeDiff = Math.floor(timeDiff / 60);
-
-        // get hours
-        hours = Math.round(timeDiff % 24);
-
-        // remove hours from the date
-        timeDiff = Math.floor(timeDiff / 24);
-
-        // the rest of timeDiff is number of days
-        days = timeDiff;
-      } else {
-        days = 0;
-        hours = 0;
-        minutes = 0;
-        seconds = 0;
-      }
-
-      return days + 'd:' + hours + 'h:' + minutes + 'm:' + seconds + 's';
-    }
-  })),
-  props: {
-    id: {
-      type: String,
-      required: true
-    }
-  }
-};
-
-/**
- * This component will morph into the given field.
- * NOTE: Remember to update this component with all relevant properties from possible fields,
- * so the properties can be properly bound.
- */
-var FieldMorpher = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.field.fieldType, { tag: "component", attrs: { "id": _vm.fieldId, "label": _vm.field.fieldLabel } });
-  },
-  staticRenderFns: [],
-  name: 'field-morpher',
-  props: {
-    field: {
-      type: Object,
-      required: true
-    },
-    fieldId: {
-      type: String,
-      required: true
-    }
-  },
-  components: {
-    TextField: TextField,
-    TextAreaField: TextAreaField,
-    DateField: DateField,
-    TimeField: TimeField,
-    CompletableField: CompletableField,
-    TimeSinceField: TimeSinceField
-  }
-};
-
-// @TODO: Get this to work without javascript,
-// and get this to work with reloading the page
-
-var NewItemPageStep2 = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _vm.template ? _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("Time to add a new " + _vm._s(_vm.template.templateName) + "!")]) : _vm._e(), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "new_item", "method": "POST", "action": "/app/new-item" }, on: { "submit": _vm.addItem } }, [_vm._l(_vm.template.fields, function (field, index) {
-      return [_c('field-morpher', { attrs: { "field": field, "fieldId": 'field_' + index } })];
-    }), _vm._v(" "), _c('div', { staticClass: "hxb-form-field" }, [_c('submit-button', { attrs: { "text": "Save" } })], 1)], 2), _vm._v(" "), _c('app-footer')], 1);
-  },
-  staticRenderFns: [],
-  name: 'new-item-page-2',
-  computed: _extends({}, mapGetters({
-    template: 'templates/getActiveTemplate'
-  })),
-  methods: {
-    addItem: function addItem(e) {
-      var i = void 0,
-          templateField = void 0;
-      var self = this;
-      var form = this.$store.state.form.fields;
-      var templateFields = this.template.fields;
-      var item = {
-        isItem: true,
-        fields: []
-      };
-
-      e.preventDefault();
-
-      // convert the template into an item, so that all template data
-      // is localized, and changes to the template will not affect items
-      // unless an explicit update is made
-      for (i = 0; i < templateFields.length; i++) {
-        templateField = templateFields[i];
-
-        item.fields.push({
-          fieldLabel: templateField.fieldLabel,
-          fieldType: templateField.fieldType,
-          showInPreview: templateField.showInPreview,
-          value: form['field_' + i]
-        });
-      }
-      item.templateName = this.template.templateName;
-
-      hoodie.ready.then(function () {
-        if (hoodie.account.isSignedIn()) {
-          hoodie.store.add(item);
-          // redirect to the home page when finished
-          self.$router.push('/app/home');
-        } else {
-          throw new Error('User is not currently signed in.');
-        }
-      });
-    }
-  },
-  components: {
-    AppHeader: AppHeader,
-    AppFooter: AppFooter,
-    FieldMorpher: FieldMorpher,
-    SubmitButton: SubmitButton
-  }
-};
-
-var RemoveButton = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('button', { staticClass: "hxb-remove-button", attrs: { "type": "button" }, on: { "click": _vm.remove } }, [_vm._v("x")]);
-  },
-  staticRenderFns: [],
-  name: 'remove-button',
-  props: {
-    remove: {
-      type: Function,
-      required: true
-    }
-  }
-};
-
-/*
- * options {ARRAY} - [{ label: 'string', value: 'string' }, ...]
- */
-var RadioButtonField = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('fieldset', { staticClass: "hxb-fieldset" }, [_c('legend', [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _vm._l(_vm.options, function (option, index) {
-      return [_c('input', { staticClass: "hxb-radio-button", attrs: { "id": _vm.id + '_' + index, "type": "radio", "name": _vm.id }, domProps: { "checked": _vm.isChecked(option.value), "value": option.value }, on: { "change": _vm.update } }), _vm._v(" "), _c('label', { staticClass: "hxb-radio-button-label", attrs: { "for": _vm.id + '_' + index } }, [_vm._v("\n      " + _vm._s(option.label) + "\n    ")])];
-    })], 2);
-  },
-  staticRenderFns: [],
-  name: 'radio-button-field',
-  methods: {
-    update: function update(e) {
-      // tell action in form vuex module to update its form field with the following key/value pair
-      this.$store.dispatch('form/updateField', {
-        name: this.id,
-        value: e.target.value
-      });
-    },
-    isChecked: function isChecked(value) {
-      return this.value === value ? 'checked' : '';
-    }
-  },
-  computed: _extends({}, mapState({
-    value: function value(state) {
-      return state.form.fields[this.id];
-    }
-  })),
-  props: {
-    id: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    },
-    options: {
-      type: Array,
-      required: true
-    }
-  }
-};
-
-var FieldCard = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-field-card" }, [_c('remove-button', { attrs: { "remove": _vm.remove } }), _vm._v(" "), _c('text-field', { attrs: { "id": _vm.fieldLabel, "label": "Field Label" } }), _vm._v(" "), _c('dropdown-field', { attrs: { "id": _vm.fieldType, "label": "Field Type", "options": _vm.fieldTypes } }), _vm._v(" "), _c('radio-button-field', { attrs: { "id": _vm.showInPreview, "label": "Show in preview?", "options": _vm.radioButtonOptions } })], 1);
-  },
-  staticRenderFns: [],
-  name: 'field-card',
-  data: function data() {
-    return {
-      fieldLabel: 'fieldLabel_' + this.fieldIndex,
-      fieldType: 'fieldType_' + this.fieldIndex,
-      showInPreview: 'showInPreview_' + this.fieldIndex,
-      radioButtonOptions: [{
-        label: 'No',
-        value: 'no'
-      }, {
-        label: 'Yes',
-        value: 'yes'
-      }],
-      fieldTypes: [{
-        label: '-- Select One --',
-        value: ''
-      }, {
-        label: 'Text Field',
-        value: 'TextField'
-      }, {
-        label: 'Large Text Field',
-        value: 'TextAreaField'
-      }, {
-        label: 'Date',
-        value: 'DateField'
-      }, {
-        label: 'Time',
-        value: 'TimeField'
-      }, {
-        label: 'Completable',
-        value: 'CompletableField'
-      }, {
-        label: 'Time Since',
-        value: 'TimeSinceField'
-      }]
-    };
-  },
-  methods: {
-    remove: function remove() {
-      // clean up the fields we're about to remove from the form
-      this.$store.dispatch('form/removeField', {
-        name: this.fieldLabel
-      });
-      this.$store.dispatch('form/removeField', {
-        name: this.fieldType
-      });
-      this.$store.dispatch('form/removeField', {
-        name: this.showInPreview
-      });
-      // tells the parent component that we've done the clean up necessary
-      // to now remove this card
-      console.log('Calling removeField in FieldCard on index ' + this.fieldIndex);
-      this.removeField(this.fieldIndex);
-    }
-  },
-  props: {
-    fieldIndex: {
-      type: Number,
-      required: true
-    },
-    removeField: {
-      type: Function,
-      required: true
-    }
-  },
-  components: {
-    RemoveButton: RemoveButton,
-    TextField: TextField,
-    DropdownField: DropdownField,
-    RadioButtonField: RadioButtonField
-  }
-};
-
-var AddItemButton = {
-  render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('button', { staticClass: "hxb-field-card hxb-add-item-button", attrs: { "type": "button" }, on: { "click": _vm.addField } }, [_c('span', { staticClass: "hxb-add-item-button__icon" }, [_vm._v("+")])]);
-  },
-  staticRenderFns: [],
-  name: 'add-item-button',
-  methods: _extends({}, mapActions({
-    addField: 'fields/addField'
-  }))
-};
-
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -23336,6 +21871,46 @@ function addTimestamps(doc) {
   return doc;
 }
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
 /**
  * Adds one object to the local database.
  *
@@ -23465,7 +22040,7 @@ function isntDesignDoc(row) {
 /**
  * Finds all existing objects in local database.
  *
- * @param  {Function} {REQUIRED} filter   Function returning `true` for any object
+ * @param  {Function} {OPTIONAL} filter   Function returning `true` for any object
  *                                        to be returned.
  * @param  {String}   {OPTIONAL} prefix   optional id prefix
  * @return {Promise}
@@ -23768,7 +22343,7 @@ function remove$1$1(idsOrObjects, change, prefix) {
  * Updates existing object.
  * 
  * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
- * @param  {Function|Object} {REQUIRED} change       Changed properties or function that alters passed doc
+ * @param  {Function|Object} {OPTIONAL} change       Changed properties or function that alters passed doc
  * @param  {String}          {OPTIONAL} prefix       Optional id prefix
  * @return {Promise}
  */
@@ -23859,6 +22434,1405 @@ var lib = {
       db.sync(remoteDB);
     }
   }
+};
+
+var templateModule = {
+  // namespace this module so that it doesn't collide with other store behavior
+  namespaced: true, // -> getters['templates/*']
+  // default values
+  state: { templates: [{}], activeTemplate: {} },
+  getters: {
+    getTemplates: function getTemplates(state) {
+      return state.templates;
+    },
+    getActiveTemplate: function getActiveTemplate(state) {
+      return state.activeTemplate;
+    }
+  },
+  // directly update the store
+  mutations: {
+    // set template list
+    TEMPLATE_LIST: function TEMPLATE_LIST(state, templates) {
+      state.templates = templates;
+    },
+    // set current template
+    ACTIVE_TEMPLATE: function ACTIVE_TEMPLATE(state, template) {
+      console.log(template);
+      state.activeTemplate = template;
+    }
+  },
+  // update the store event handler
+  actions: {
+    getTemplates: function getTemplates(_ref) {
+      var commit = _ref.commit,
+          state = _ref.state;
+
+      var findAllTemplates = function findAllTemplates(resolve, reject) {
+        var db = lib.get();
+        // look through the DB for all the templates
+        db.pleaseFindAll(function (doc) {
+          return doc.templateName && !doc.isItem;
+        }).then(function (templateDocs) {
+          console.log('done loading templates');
+          console.log(templateDocs);
+          // update the store with the list of available templates
+          commit('TEMPLATE_LIST', templateDocs);
+          resolve(templateDocs);
+        }).catch(function (error) {
+          console.log(error);
+          reject(error);
+        });
+      };
+
+      return null;
+    },
+    getTemplate: function getTemplate(_ref2, id) {
+      var commit = _ref2.commit,
+          state = _ref2.state;
+
+      var findTemplate = function findTemplate(resolve, reject) {
+        var db = lib.get();
+        // look through the DB for all the items
+        db.pleaseFind(id).then(function (templateDoc) {
+          // update the store with the list of available items
+          commit('ACTIVE_TEMPLATE', templateDoc);
+          resolve(templateDoc);
+        }).catch(function (error) {
+          console.log(error);
+          reject(error);
+        });
+      };
+
+      return null;
+    },
+    setTemplate: function setTemplate(_ref3, template) {
+      var commit = _ref3.commit,
+          state = _ref3.state;
+
+      commit('ACTIVE_TEMPLATE', template);
+    }
+  }
+};
+
+var itemModule = {
+  // namespace this module so that it doesn't collide with other store behavior
+  namespaced: true, // -> getters['items/*']
+  // default values
+  state: { items: [{}], activeItem: {} },
+  getters: {
+    getItems: function getItems(state) {
+      return state.items;
+    },
+    getActiveItem: function getActiveItem(state) {
+      return state.activeItem;
+    }
+  },
+  // directly update the store
+  mutations: {
+    // set item list
+    ITEM_LIST: function ITEM_LIST(state, items) {
+      state.items = items;
+    },
+    // set current item
+    ACTIVE_ITEM: function ACTIVE_ITEM(state, item) {
+      console.log(item);
+      state.activeItem = item;
+    }
+  },
+  // update the store event handler
+  actions: {
+    getItems: function getItems(_ref) {
+      var commit = _ref.commit,
+          state = _ref.state;
+
+      var findAllItems = function findAllItems(resolve, reject) {
+        var db = lib.get();
+        // look through the DB for all the items
+        db.pleaseFindAll(function (doc) {
+          return doc.isItem;
+        }).then(function (itemDocs) {
+          console.log('ITEMS FOUND:');
+          console.log(itemDocs);
+          // update the store with the list of available items
+          commit('ITEM_LIST', itemDocs);
+          resolve(itemDocs);
+        }).catch(function (error) {
+          console.log(error);
+          reject(error);
+        });
+      };
+
+      return null;
+    },
+    getItem: function getItem(_ref2, id) {
+      var commit = _ref2.commit,
+          state = _ref2.state;
+
+      var findItem = function findItem(resolve, reject) {
+        var db = lib.get();
+        // look through the DB for all the items
+        db.pleaseFind(id).then(function (itemDoc) {
+          // update the store with the list of available items
+          commit('ACTIVE_ITEM', itemDoc);
+          resolve(itemDoc);
+        }).catch(function (error) {
+          console.log(error);
+          reject(error);
+        });
+      };
+
+      return null;
+    },
+    getToDoItems: function getToDoItems(_ref3) {
+      var commit = _ref3.commit,
+          state = _ref3.state;
+
+      var findAllToDoItems = function findAllToDoItems(resolve, reject) {
+        var db = lib.get();
+        // look through the DB for all the items
+        db.pleaseFindAll(function (field) {
+          return field.fieldType === 'CompletableField';
+        }).then(function (itemDocs) {
+          console.log('TO DO ITEMS FOUND:');
+          console.log(itemDocs);
+
+          // @TODO: Refactor into configurable system
+          // Sort items date desc
+          itemDocs.sort(function (itemA, itemB) {
+            var dateA = void 0,
+                dateB = void 0,
+                date = void 0,
+                time = void 0;
+
+            // get all relevant fields that have been filled out
+            var dateFieldsA = itemA.fields.filter(function (field) {
+              return field.fieldType === 'DateField' && field.value;
+            });
+            var dateFieldsB = itemB.fields.filter(function (field) {
+              return field.fieldType === 'DateField' && field.value;
+            });
+            var timeFieldsA = itemA.fields.filter(function (field) {
+              return field.fieldType === 'TimeField' && field.value;
+            });
+            var timeFieldsB = itemB.fields.filter(function (field) {
+              return field.fieldType === 'TimeField' && field.value;
+            });
+
+            // we're going to sort by the first date and time field we find,
+            // because how else are we going to do that
+            if (dateFieldsA.length || timeFieldsA.length) {
+              dateA = new Date();
+            }
+            if (dateFieldsA.length) {
+              date = dateFieldsA[0].value.split('-');
+              dateA.setYear(date[0]);
+              dateA.setMonth(date[1]);
+              dateA.setDate(date[2]);
+            }
+            if (timeFieldsA.length) {
+              time = timeFieldsA[0].value.split(':');
+              dateA.setHours(time[0]);
+              dateA.setMinutes(time[1]);
+            }
+
+            if (dateFieldsB.length || timeFieldsB.length) {
+              dateB = new Date();
+            }
+            if (dateFieldsB.length) {
+              date = dateFieldsB[0].value.split('-');
+              dateB.setYear(date[0]);
+              dateB.setMonth(date[1]);
+              dateB.setDate(date[2]);
+            }
+            if (timeFieldsB.length) {
+              time = timeFieldsB[0].value.split(':');
+              dateB.setHours(time[0]);
+              dateB.setMinutes(time[1]);
+            }
+
+            // sort by date desc
+            if (dateA && dateB) {
+              return dateB.getTime() - dateA.getTime();
+            } else if (dateA) {
+              // A < B
+              return -1;
+            } else if (dateB) {
+              // A > B
+              return 1;
+            } else {
+              // Neither have dates, so they're equal
+              return 0;
+            }
+          });
+
+          // update the store with the list of available items
+          commit('ITEM_LIST', itemDocs);
+          resolve(itemDocs);
+        }).catch(function (error) {
+          console.log(error);
+          reject(error);
+        });
+      };
+
+      return null;
+    },
+    setItem: function setItem(_ref4, item) {
+      var commit = _ref4.commit,
+          state = _ref4.state;
+
+      commit('ACTIVE_ITEM', item);
+    }
+  }
+};
+
+Vue$2$1.use(index_esm);
+
+var defaultState = {
+  topics: [],
+  count: 0
+};
+
+var inBrowser$1 = typeof window !== 'undefined';
+
+// if in browser, use pre-fetched state injected by SSR
+var state$1 = inBrowser$1 && window.__INITIAL_STATE__ || defaultState;
+
+var mutations = {
+  TOPICS_LIST: function TOPICS_LIST(state, topics) {
+    state.topics = topics;
+  },
+
+  INCREMENT: function INCREMENT(state) {
+    state.count++;
+  },
+
+  DECREMENT: function DECREMENT(state) {
+    state.count--;
+  }
+};
+
+var store = new index_esm.Store({
+  state: state$1,
+  actions: actions,
+  mutations: mutations,
+  getters: getters,
+  modules: {
+    form: formModule,
+    fields: fieldListModule,
+    items: itemModule,
+    templates: templateModule
+  }
+});
+
+var __dirname = '/home/ubuntu/workspace/src/router';
+
+/*
+ * This is a text field. It can be of type text, email, password, etc.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this text field.
+ * @param {STRING} {REQUIRED} label       The label for this text field.
+ * @param {STRING} {OPTIONAL} type        The type of input field this will be. (text, password, email, etc.)
+ * @param {STRING} {OPTIONAL} placeholder The placeholder attribute for this text field.
+ */
+
+var TextField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": _vm.type, "name": _vm.id, "placeholder": _vm.placeholder }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
+  },
+  staticRenderFns: [],
+  name: 'text-field',
+  methods: {
+    update: function update(e) {
+      // tell action in form vuex module to update its form field with the following key/value pair
+      this.$store.dispatch('form/updateField', {
+        name: this.id,
+        value: e.target.value
+      });
+    }
+  },
+  computed: _extends({}, mapState({
+    value: function value(state) {
+      return state.form.fields[this.id];
+    }
+  })),
+  // define the props that can be passed in, to differentiate local variables versus arguments I guess
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: String,
+      default: 'text',
+      required: false
+    },
+    placeholder: {
+      type: String,
+      required: false
+    }
+  }
+};
+
+var SubmitButton = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('button', { staticClass: "hxb-button", attrs: { "type": "submit" } }, [_vm._v(_vm._s(_vm.text))]);
+  },
+  staticRenderFns: [],
+  name: 'submit-button',
+  props: {
+    text: {
+      type: String,
+      required: true
+    }
+  }
+};
+
+var LoginForm = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('form', { staticClass: "hxb-form", attrs: { "name": "login", "method": "post", "action": "/app/login" }, on: { "submit": _vm.login } }, [_c('text-field', { attrs: { "id": "username", "label": "username", "type": "text", "placeholder": "username" } }), _vm._v(" "), _c('text-field', { attrs: { "id": "password", "label": "password", "type": "password", "placeholder": "password" } }), _vm._v(" "), _c('submit-button', { attrs: { "text": "Login" } }), _vm._v(" "), _c('router-link', { attrs: { "to": "/app/register", "exact": "" } }, [_vm._v("or Register")])], 1);
+  },
+  staticRenderFns: [],
+  name: 'login-form',
+  created: function created() {
+    this.$store.dispatch('form/resetForm');
+  },
+
+  methods: {
+    login: function login(e) {
+      var self = this,
+          username = self.$store.state.form.fields.username,
+          password = self.$store.state.form.fields.password;
+      e.preventDefault();
+
+      // @TODO: ajax call to login, where the server will return the user's db url
+      // for us to sync with
+      self.$router.push('/app/home');
+    }
+  },
+  components: {
+    TextField: TextField,
+    SubmitButton: SubmitButton
+  }
+};
+
+var LoginPage = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('article', [_vm._m(0), _vm._v(" "), _c('login-form')], 1);
+  },
+  staticRenderFns: [function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('header', [_c('h1', { staticClass: "hxb-u-txt-center" }, [_vm._v("Hexelberry Orchard")])]);
+  }],
+  name: 'login-page',
+  // List the components used on this page. This is using ES2015 syntax,
+  // where PrimaryButton is the same as 'PrimaryButton': PrimaryButton
+  components: {
+    LoginForm: LoginForm
+  }
+};
+
+var RegisterForm = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('form', { staticClass: "hxb-form", attrs: { "name": "register", "method": "post", "action": "/app/register" }, on: { "submit": _vm.register } }, [_c('text-field', { attrs: { "id": "username", "label": "username", "type": "text", "placeholder": "username" } }), _vm._v(" "), _c('text-field', { attrs: { "id": "password", "label": "password", "type": "password", "placeholder": "password" } }), _vm._v(" "), _c('submit-button', { attrs: { "text": "Register" } })], 1);
+  },
+  staticRenderFns: [],
+  name: 'register-form',
+  created: function created() {
+    this.$store.dispatch('form/resetForm');
+  },
+
+  methods: {
+    register: function register(e) {
+      var self = this,
+          username = self.$store.state.form.fields.username,
+          password = self.$store.state.form.fields.password;
+      e.preventDefault();
+
+      // @TODO: ajax call to register, where CouchDB url will be created, and the url
+      // to sync with will be returned. Prerequisite: Authorization token for signing up for premium.
+      self.$router.push('/app/home');
+    }
+  },
+  components: {
+    TextField: TextField,
+    SubmitButton: SubmitButton
+  }
+};
+
+var RegisterPage = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_vm._m(0), _vm._v(" "), _c('register-form')], 1);
+  },
+  staticRenderFns: [function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('header', [_c('h1', { staticClass: "hxb-u-txt-center" }, [_vm._v("Hexelberry Orchard")])]);
+  }],
+  name: 'register-page',
+  // List the components used on this page. This is using ES2015 syntax,
+  // where PrimaryButton is the same as 'PrimaryButton': PrimaryButton
+  components: {
+    RegisterForm: RegisterForm
+  }
+};
+
+var AppFooter = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('footer', { staticClass: "hxb-footer" }, [_c('ul', { staticClass: "hxb-footer-list" }, [_c('li', { staticClass: "hxb-footer-list__action" }, [_c('router-link', { attrs: { "to": "/app/todo" } }, [_vm._v("To Do")])], 1), _vm._v(" "), _c('li', { staticClass: "hxb-footer-list__action" }, [_c('router-link', { attrs: { "to": "/app/search" } }, [_vm._v("Search")])], 1), _vm._v(" "), _c('li', { staticClass: "hxb-footer-list__action" }, [_c('router-link', { attrs: { "to": "/app/edit" } }, [_vm._v("Edit")])], 1), _vm._v(" "), _c('li', { staticClass: "hxb-footer-list__action" }, [_c('router-link', { attrs: { "to": "/app/new" } }, [_vm._v("New")])], 1)])]);
+  },
+  staticRenderFns: [],
+  name: 'app-footer'
+};
+
+var AppHeader = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('header', { staticClass: "hxb-header" }, [_c('router-link', { attrs: { "to": "/app/home" } }, [_vm._v("Hexelberry Orchard")])], 1);
+  },
+  staticRenderFns: [],
+  name: 'app-header'
+};
+
+/*
+ * This is the output of a text field.
+ */
+
+var DisplayTextField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v(_vm._s(_vm.value))]) : _vm._e();
+  },
+  staticRenderFns: [],
+  name: 'display-text-field',
+  props: {
+    value: {
+      type: String,
+      required: false
+    }
+  }
+};
+
+/*
+ * This is the output of a text area field.
+ */
+
+var DisplayTextAreaField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v(_vm._s(_vm.value))]) : _vm._e();
+  },
+  staticRenderFns: [],
+  name: 'display-textarea-field',
+  props: {
+    value: {
+      type: String,
+      required: false
+    }
+  }
+};
+
+/*
+ * This is the output of a date field.
+ * 
+ * @TODO: How do we set up preferred date display?
+ */
+
+var DisplayDateField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v(_vm._s(_vm.value))]) : _vm._e();
+  },
+  staticRenderFns: [],
+  name: 'display-date-field',
+  props: {
+    value: {
+      type: String,
+      required: false
+    }
+  }
+};
+
+/*
+ * This is the output of a time field.
+ * 
+ * @TODO: Right now it displays in military time. How do we setup option for preferred time display?
+ */
+
+var DisplayTimeField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v(_vm._s(_vm.value))]) : _vm._e();
+  },
+  staticRenderFns: [],
+  name: 'display-time-field',
+  props: {
+    value: {
+      type: String,
+      required: false
+    }
+  }
+};
+
+/*
+ * This is the output of a completable field.
+ * 
+ */
+
+var DisplayCompletableField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm.value ? _c('p', [_vm._v("Completed")]) : _c('p', [_vm._v("Incomplete")]);
+  },
+  staticRenderFns: [],
+  name: 'display-completable-field',
+  props: {
+    value: {
+      type: Boolean,
+      required: false
+    }
+  }
+};
+
+/*
+ * This is the output of a time since field.
+ */
+
+var DisplayTimeSinceField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('p', [_vm._v(_vm._s(_vm.displayValue))]);
+  },
+  staticRenderFns: [],
+  name: 'display-time-since-field',
+  computed: {
+    // @TODO: Refactor into utility fn (or likely replace with a date library)
+    displayValue: function displayValue(state) {
+      var days = void 0,
+          hours = void 0,
+          minutes = void 0,
+          seconds = void 0;
+      var latestDate = this.value;
+
+      if (latestDate) {
+        // looks like it gets saved as a string, so convert to date
+        latestDate = new Date(latestDate);
+
+        // time difference in ms
+        var timeDiff = new Date().getTime() - latestDate;
+
+        // strip the ms
+        timeDiff /= 1000;
+
+        // get seconds
+        seconds = Math.round(timeDiff % 60);
+
+        // remove seconds from the date
+        timeDiff = Math.floor(timeDiff / 60);
+
+        // get minutes
+        minutes = Math.round(timeDiff % 60);
+
+        // remove minutes from the date
+        timeDiff = Math.floor(timeDiff / 60);
+
+        // get hours
+        hours = Math.round(timeDiff % 24);
+
+        // remove hours from the date
+        timeDiff = Math.floor(timeDiff / 24);
+
+        // the rest of timeDiff is number of days
+        days = timeDiff;
+      } else {
+        days = 0;
+        hours = 0;
+        minutes = 0;
+        seconds = 0;
+      }
+
+      return days + 'd:' + hours + 'h:' + minutes + 'm:' + seconds + 's';
+    }
+  },
+  props: {
+    value: {
+      required: false
+    }
+  }
+};
+
+/**
+ * This component will morph into the given field.
+ * NOTE: Remember to update this component with all relevant properties from possible fields,
+ * so the properties can be properly bound.
+ */
+var DisplayFieldMorpher = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('Display' + _vm.field.fieldType, { tag: "component", attrs: { "value": _vm.field.value } });
+  },
+  staticRenderFns: [],
+  name: 'display-field-morpher',
+  props: {
+    field: {
+      type: Object,
+      required: true
+    }
+  },
+  components: {
+    DisplayTextField: DisplayTextField,
+    DisplayTextAreaField: DisplayTextAreaField,
+    DisplayDateField: DisplayDateField,
+    DisplayTimeField: DisplayTimeField,
+    DisplayCompletableField: DisplayCompletableField,
+    DisplayTimeSinceField: DisplayTimeSinceField
+  }
+};
+
+var DisplayItem = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('section', { staticClass: "hxb-object-list-item" }, [_c('router-link', { staticClass: "hxb-object-list-item__link", attrs: { "to": _vm.itemPath + _vm.item.id } }, [_vm._l(_vm.item.fields, function (field) {
+      return field.showInPreview === 'yes' ? [_c('display-field-morpher', { attrs: { "field": field } })] : _vm._e();
+    })], 2)], 1);
+  },
+  staticRenderFns: [],
+  name: 'display-item',
+  data: function data() {
+    return {
+      itemPath: '/app/item/'
+    };
+  },
+  components: {
+    DisplayFieldMorpher: DisplayFieldMorpher
+  },
+  props: {
+    item: {
+      type: Object,
+      required: true
+    }
+  }
+};
+
+/**
+ * Shows a list of items and bundles for the current bundle directory.
+ *
+ * @TODO: Replace items with data pulled from DB.
+ *
+ * @param {STRING} {REQUIRED} path The bundle path to display.
+ */
+
+var fetchInitialData = function fetchInitialData(store) {
+  return store.dispatch('items/getItems');
+};
+
+var ItemDirectory = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('article', { staticClass: "hxb-object-list" }, [_vm._l(_vm.items, function (item) {
+      return [_c('display-item', { attrs: { "item": item } })];
+    })], 2);
+  },
+  staticRenderFns: [],
+  name: 'item-directory',
+  computed: _extends({}, mapGetters({
+    items: 'items/getItems'
+  })),
+  mounted: function mounted() {
+    fetchInitialData(this.$store);
+  },
+
+  components: {
+    DisplayItem: DisplayItem
+  },
+  props: {
+    path: {
+      type: String,
+      required: true
+    }
+  }
+};
+
+var HomePage = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('item-directory', { attrs: { "path": "/" } }), _vm._v(" "), _c('app-footer')], 1);
+  },
+  staticRenderFns: [],
+  name: 'home-page',
+  components: {
+    AppFooter: AppFooter,
+    AppHeader: AppHeader,
+    ItemDirectory: ItemDirectory
+  }
+};
+
+/*
+ * An object list is one that lists items.
+ *
+ * choices {ARRAY} - [{ link: 'string', label: 'string' }, ...]
+ */
+var ObjectList = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('ul', { staticClass: "hxb-object-list", class: { 'is-indented': _vm.isIndented } }, _vm._l(_vm.objects, function (object) {
+      return object.link && object.label ? _c('li', { staticClass: "hxb-object-list-item" }, [_c('router-link', { staticClass: "hxb-object-list-item__link", attrs: { "to": object.link } }, [_c('span', [_vm._v(_vm._s(object.label))]), _vm._v(" "), _c('span', { staticClass: "hxb-object-list-item__arrow" }, [_vm._v("⇢")])])], 1) : _vm._e();
+    }));
+  },
+  staticRenderFns: [],
+  name: 'object-list',
+  props: {
+    objects: {
+      type: Array,
+      required: true
+    },
+    isIndented: {
+      type: Boolean,
+      required: false
+    }
+  }
+};
+
+var NewPage = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("Time to make a new...")]), _vm._v(" "), _c('object-list', { attrs: { "objects": _vm.objects, "is-indented": _vm.isIndented } }), _vm._v(" "), _c('app-footer')], 1);
+  },
+  staticRenderFns: [],
+  name: 'new-page',
+  data: function data() {
+    return {
+      objects: [{
+        label: 'Item',
+        link: '/app/new-item'
+      }, {
+        label: 'Template',
+        link: '/app/new-template'
+      }, {
+        label: 'Bundle',
+        link: '/app/new-bundle'
+      }],
+      isIndented: true
+    };
+  },
+  components: {
+    AppHeader: AppHeader,
+    AppFooter: AppFooter,
+    ObjectList: ObjectList
+  }
+};
+
+/*
+ * This is a text field. It can be of type text, email, password, etc.
+ *
+ * @param {STRING} {REQUIRED} id       The id and name of this text field.
+ * @param {STRING} {REQUIRED} label    The label for this text field.
+ * @param {ARRAY}  {REQUIRED} options  An array containing the list of options, given in the format [{ label: 'string', value: 'string' }, ...]
+ */
+var DropdownField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { directives: [{ name: "model", rawName: "v-model", value: _vm.value, expression: "value" }], staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": [function ($event) {
+          var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+            return o.selected;
+          }).map(function (o) {
+            var val = "_value" in o ? o._value : o.value;return val;
+          });_vm.value = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+        }, _vm.update] } }, _vm._l(_vm.options, function (option) {
+      return _c('option', { domProps: { "value": option.value } }, [_vm._v(_vm._s(option.label))]);
+    }))]);
+  },
+  staticRenderFns: [],
+  name: 'dropdown-field',
+  methods: {
+    update: function update(e) {
+      // tell action in form vuex module to update its form field with the following key/value pair
+      this.$store.dispatch('form/updateField', {
+        name: this.id,
+        value: e.target.value
+      });
+    },
+    isSelected: function isSelected(value) {
+      return this.value === value;
+    }
+  },
+  computed: _extends({}, mapState({
+    value: function value(state) {
+      return state.form.fields[this.id] || '';
+    }
+  })),
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    options: {
+      type: Array,
+      required: true
+    }
+  }
+};
+
+var fetchInitialData$1 = function fetchInitialData(store) {
+  return store.dispatch('templates/getTemplates');
+};
+
+var NewItemPageStep1 = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), !_vm.areTemplatesLoaded() ? _c('h1', { staticClass: "hxb-u-pdl-1 hxb-u-txt-center" }, [_vm._v("Loading...")]) : _vm._e(), _vm._v(" "), _vm.templates.length > 0 ? _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("What would you like to organize today?")]) : _vm._e(), _vm._v(" "), _vm.templates.length > 0 ? _c('form', { staticClass: "hxb-form", attrs: { "name": "set_template", "method": "POST", "action": "/app/new-item-page-2" }, on: { "submit": _vm.setTemplate } }, [_c('dropdown-field', { attrs: { "id": "template", "label": "Select a template", "options": _vm.templateOptions } }), _vm._v(" "), _c('div', { staticClass: "hxb-form-field" }, [_c('submit-button', { attrs: { "text": "Save" } })], 1)], 1) : _vm._e(), _vm._v(" "), _vm.areTemplatesLoaded() && _vm.templates.length === 0 ? _c('h1', { staticClass: "hxb-u-pdl-1 hxb-u-txt-center" }, [_vm._v("No templates found. Please make a template first.")]) : _vm._e(), _vm._v(" "), _c('app-footer')], 1);
+  },
+  staticRenderFns: [],
+  name: 'new-item-page-1',
+  prefetch: fetchInitialData$1,
+  computed: _extends({}, mapGetters({
+    templates: 'templates/getTemplates'
+  }), {
+    templateOptions: function templateOptions() {
+      var i = void 0,
+          template = void 0;
+      var templates = this.templates;
+      var templateList = [{
+        label: '-- please select one --',
+        value: ''
+      }];
+
+      for (i = 0; i < templates.length; i++) {
+        template = templates[i];
+        templateList.push({
+          label: template.templateName,
+          value: template.id
+        });
+      }
+
+      return templateList;
+    }
+  }),
+  created: function created() {
+    this.$store.dispatch('form/resetForm');
+  },
+  mounted: function mounted() {
+    fetchInitialData$1(this.$store);
+  },
+
+  methods: {
+    areTemplatesLoaded: function areTemplatesLoaded() {
+      return Array.isArray(this.templateOptions);
+    },
+    setTemplate: function setTemplate(e) {
+      var i = void 0,
+          template = void 0;
+      var templateId = this.$store.state.form.fields['template'];
+
+      e.preventDefault();
+
+      for (i = 0; i < this.templates.length; i++) {
+        if (this.templates[i].id === templateId) {
+          template = this.templates[i];
+          break;
+        }
+      }
+
+      this.$store.dispatch('templates/setTemplate', template);
+      this.$router.push('/app/new-item-page-2');
+    }
+  },
+  components: {
+    AppHeader: AppHeader,
+    AppFooter: AppFooter,
+    DropdownField: DropdownField,
+    SubmitButton: SubmitButton
+  }
+};
+
+var TextAreaField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('textarea', { staticClass: "hxb-input-field", attrs: { "id": _vm.id, "name": _vm.id, "placeholder": _vm.placeholder, "rows": "10", "cols": "50" }, on: { "input": _vm.update } }, [_vm._v(_vm._s(_vm.value))])]);
+  },
+  staticRenderFns: [],
+  name: 'textarea-field',
+  methods: {
+    update: function update(e) {
+      // tell action in form vuex module to update its form field with the following key/value pair
+      this.$store.dispatch('form/updateField', {
+        name: this.id,
+        value: e.target.value
+      });
+    }
+  },
+  computed: _extends({}, mapState({
+    value: function value(state) {
+      return state.form.fields[this.id];
+    }
+  })),
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    placeholder: {
+      type: String,
+      required: false
+    }
+  }
+};
+
+/*
+ * This is a date field.
+ * 
+ * @TODO: Add datepicker.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this date field.
+ * @param {STRING} {REQUIRED} label       The label for this date field.
+ */
+
+var DateField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": "date", "name": _vm.id, "placeholder": "yyyy-mm-dd" }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
+  },
+  staticRenderFns: [],
+  name: 'date-field',
+  methods: {
+    update: function update(e) {
+      // tell action in form vuex module to update its form field with the following key/value pair
+      this.$store.dispatch('form/updateField', {
+        name: this.id,
+        value: e.target.value
+      });
+    }
+  },
+  computed: _extends({}, mapState({
+    value: function value(state) {
+      return state.form.fields[this.id];
+    }
+  })),
+  // define the props that can be passed in, to differentiate local variables versus arguments I guess
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    }
+  }
+};
+
+/*
+ * This is a time field.
+ * 
+ * @TODO: Add time picker, figure out time zones.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this field.
+ * @param {STRING} {REQUIRED} label       The label for this field.
+ */
+
+var TimeField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": "time", "name": _vm.id, "placeholder": "HH:MM" }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
+  },
+  staticRenderFns: [],
+  name: 'time-field',
+  methods: {
+    update: function update(e) {
+      // tell action in form vuex module to update its form field with the following key/value pair
+      this.$store.dispatch('form/updateField', {
+        name: this.id,
+        value: e.target.value
+      });
+    }
+  },
+  computed: _extends({}, mapState({
+    value: function value(state) {
+      return state.form.fields[this.id];
+    }
+  })),
+  // define the props that can be passed in, to differentiate local variables versus arguments I guess
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    }
+  }
+};
+
+var CheckboxField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('input', { staticClass: "hxb-checkbox", attrs: { "id": _vm.id, "type": "checkbox", "name": _vm.id }, domProps: { "checked": _vm.value }, on: { "change": _vm.update } }), _vm._v(" "), _c('label', { staticClass: "hxb-checkbox-label", attrs: { "for": _vm.id } }, [_vm._v("\n    " + _vm._s(_vm.label) + "\n  ")])]);
+  },
+  staticRenderFns: [],
+  name: 'checkbox-field',
+  methods: {
+    update: function update(e) {
+      // tell action in form vuex module to update its form field with the following key/value pair
+      this.$store.dispatch('form/updateField', {
+        name: this.id,
+        value: e.target.checked
+      });
+    }
+  },
+  computed: _extends({}, mapState({
+    value: function value(state) {
+      return state.form.fields[this.id];
+    }
+  })),
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    }
+  }
+};
+
+var CompletableField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('checkbox-field', { attrs: { "id": _vm.id, "label": _vm.label } });
+  },
+  staticRenderFns: [],
+  name: 'completable-field',
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    }
+  },
+  components: {
+    CheckboxField: CheckboxField
+  }
+};
+
+/*
+ * This is a time since field. This shows the amount of time that has elapsed
+ * since the time has been reset.
+ * 
+ * @TODO: Add datepicker.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this date field.
+ * @param {STRING} {REQUIRED} label       The label for this date field.
+ */
+
+var TimeSinceField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('span', { staticClass: "hxb-u-display-block" }, [_vm._v(_vm._s(_vm.value))]), _vm._v(" "), _c('button', { staticClass: "hxb-button", attrs: { "type": "button" }, on: { "click": _vm.resetTime } }, [_vm._v("Reset")])]);
+  },
+  staticRenderFns: [],
+  name: 'date-field',
+  methods: {
+    resetTime: function resetTime(e) {
+      // tell action in form vuex module to update its form field with the following key/value pair
+      this.$store.dispatch('form/updateField', {
+        name: this.id,
+        value: new Date()
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.$store.dispatch('form/updateField', {
+      name: this.id,
+      value: new Date()
+    });
+  },
+  computed: _extends({}, mapState({
+    // @TODO: Refactor into utility fn (or likely replace with a date library)
+    value: function value(state) {
+      var days = void 0,
+          hours = void 0,
+          minutes = void 0,
+          seconds = void 0;
+      var latestDate = state.form.fields[this.id];
+
+      if (latestDate) {
+        // looks like it gets saved as a string, so convert to date
+        latestDate = new Date(latestDate);
+
+        // time difference in ms
+        var timeDiff = new Date().getTime() - latestDate;
+
+        // strip the ms
+        timeDiff /= 1000;
+
+        // get seconds
+        seconds = Math.round(timeDiff % 60);
+
+        // remove seconds from the date
+        timeDiff = Math.floor(timeDiff / 60);
+
+        // get minutes
+        minutes = Math.round(timeDiff % 60);
+
+        // remove minutes from the date
+        timeDiff = Math.floor(timeDiff / 60);
+
+        // get hours
+        hours = Math.round(timeDiff % 24);
+
+        // remove hours from the date
+        timeDiff = Math.floor(timeDiff / 24);
+
+        // the rest of timeDiff is number of days
+        days = timeDiff;
+      } else {
+        days = 0;
+        hours = 0;
+        minutes = 0;
+        seconds = 0;
+      }
+
+      return days + 'd:' + hours + 'h:' + minutes + 'm:' + seconds + 's';
+    }
+  })),
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  }
+};
+
+/**
+ * This component will morph into the given field.
+ * NOTE: Remember to update this component with all relevant properties from possible fields,
+ * so the properties can be properly bound.
+ */
+var FieldMorpher = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.field.fieldType, { tag: "component", attrs: { "id": _vm.fieldId, "label": _vm.field.fieldLabel } });
+  },
+  staticRenderFns: [],
+  name: 'field-morpher',
+  props: {
+    field: {
+      type: Object,
+      required: true
+    },
+    fieldId: {
+      type: String,
+      required: true
+    }
+  },
+  components: {
+    TextField: TextField,
+    TextAreaField: TextAreaField,
+    DateField: DateField,
+    TimeField: TimeField,
+    CompletableField: CompletableField,
+    TimeSinceField: TimeSinceField
+  }
+};
+
+// @TODO: Get this to work without javascript,
+// and get this to work with reloading the page
+
+var NewItemPageStep2 = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _vm.template ? _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("Time to add a new " + _vm._s(_vm.template.templateName) + "!")]) : _vm._e(), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "new_item", "method": "POST", "action": "/app/new-item" }, on: { "submit": _vm.addItem } }, [_vm._l(_vm.template.fields, function (field, index) {
+      return [_c('field-morpher', { attrs: { "field": field, "fieldId": 'field_' + index } })];
+    }), _vm._v(" "), _c('div', { staticClass: "hxb-form-field" }, [_c('submit-button', { attrs: { "text": "Save" } })], 1)], 2), _vm._v(" "), _c('app-footer')], 1);
+  },
+  staticRenderFns: [],
+  name: 'new-item-page-2',
+  computed: _extends({}, mapGetters({
+    template: 'templates/getActiveTemplate'
+  })),
+  methods: {
+    addItem: function addItem(e) {
+      var i = void 0,
+          db = void 0,
+          templateField = void 0;
+      var self = this;
+      var form = this.$store.state.form.fields;
+      var templateFields = this.template.fields;
+      var item = {
+        isItem: true,
+        fields: []
+      };
+
+      e.preventDefault();
+
+      // convert the template into an item, so that all template data
+      // is localized, and changes to the template will not affect items
+      // unless an explicit update is made
+      for (i = 0; i < templateFields.length; i++) {
+        templateField = templateFields[i];
+
+        item.fields.push({
+          fieldLabel: templateField.fieldLabel,
+          fieldType: templateField.fieldType,
+          showInPreview: templateField.showInPreview,
+          value: form['field_' + i]
+        });
+      }
+      item.templateName = this.template.templateName;
+
+      db = lib.get();
+      db.pleaseAdd(item).then(function (resp) {
+        console.log(resp);
+        // redirect to the home page when finished
+        self.$router.push('/app/home');
+      }).catch(function (error) {
+        console.log(error);
+      });
+    }
+  },
+  components: {
+    AppHeader: AppHeader,
+    AppFooter: AppFooter,
+    FieldMorpher: FieldMorpher,
+    SubmitButton: SubmitButton
+  }
+};
+
+var RemoveButton = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('button', { staticClass: "hxb-remove-button", attrs: { "type": "button" }, on: { "click": _vm.remove } }, [_vm._v("x")]);
+  },
+  staticRenderFns: [],
+  name: 'remove-button',
+  props: {
+    remove: {
+      type: Function,
+      required: true
+    }
+  }
+};
+
+/*
+ * options {ARRAY} - [{ label: 'string', value: 'string' }, ...]
+ */
+var RadioButtonField = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('fieldset', { staticClass: "hxb-fieldset" }, [_c('legend', [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _vm._l(_vm.options, function (option, index) {
+      return [_c('input', { staticClass: "hxb-radio-button", attrs: { "id": _vm.id + '_' + index, "type": "radio", "name": _vm.id }, domProps: { "checked": _vm.isChecked(option.value), "value": option.value }, on: { "change": _vm.update } }), _vm._v(" "), _c('label', { staticClass: "hxb-radio-button-label", attrs: { "for": _vm.id + '_' + index } }, [_vm._v("\n      " + _vm._s(option.label) + "\n    ")])];
+    })], 2);
+  },
+  staticRenderFns: [],
+  name: 'radio-button-field',
+  methods: {
+    update: function update(e) {
+      // tell action in form vuex module to update its form field with the following key/value pair
+      this.$store.dispatch('form/updateField', {
+        name: this.id,
+        value: e.target.value
+      });
+    },
+    isChecked: function isChecked(value) {
+      return this.value === value ? 'checked' : '';
+    }
+  },
+  computed: _extends({}, mapState({
+    value: function value(state) {
+      return state.form.fields[this.id];
+    }
+  })),
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    options: {
+      type: Array,
+      required: true
+    }
+  }
+};
+
+var FieldCard = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-field-card" }, [_c('remove-button', { attrs: { "remove": _vm.remove } }), _vm._v(" "), _c('text-field', { attrs: { "id": _vm.fieldLabel, "label": "Field Label" } }), _vm._v(" "), _c('dropdown-field', { attrs: { "id": _vm.fieldType, "label": "Field Type", "options": _vm.fieldTypes } }), _vm._v(" "), _c('radio-button-field', { attrs: { "id": _vm.showInPreview, "label": "Show in preview?", "options": _vm.radioButtonOptions } })], 1);
+  },
+  staticRenderFns: [],
+  name: 'field-card',
+  data: function data() {
+    return {
+      fieldLabel: 'fieldLabel_' + this.fieldIndex,
+      fieldType: 'fieldType_' + this.fieldIndex,
+      showInPreview: 'showInPreview_' + this.fieldIndex,
+      radioButtonOptions: [{
+        label: 'No',
+        value: 'no'
+      }, {
+        label: 'Yes',
+        value: 'yes'
+      }],
+      fieldTypes: [{
+        label: '-- Select One --',
+        value: ''
+      }, {
+        label: 'Text Field',
+        value: 'TextField'
+      }, {
+        label: 'Large Text Field',
+        value: 'TextAreaField'
+      }, {
+        label: 'Date',
+        value: 'DateField'
+      }, {
+        label: 'Time',
+        value: 'TimeField'
+      }, {
+        label: 'Completable',
+        value: 'CompletableField'
+      }, {
+        label: 'Time Since',
+        value: 'TimeSinceField'
+      }]
+    };
+  },
+  methods: {
+    remove: function remove() {
+      // clean up the fields we're about to remove from the form
+      this.$store.dispatch('form/removeField', {
+        name: this.fieldLabel
+      });
+      this.$store.dispatch('form/removeField', {
+        name: this.fieldType
+      });
+      this.$store.dispatch('form/removeField', {
+        name: this.showInPreview
+      });
+      // tells the parent component that we've done the clean up necessary
+      // to now remove this card
+      console.log('Calling removeField in FieldCard on index ' + this.fieldIndex);
+      this.removeField(this.fieldIndex);
+    }
+  },
+  props: {
+    fieldIndex: {
+      type: Number,
+      required: true
+    },
+    removeField: {
+      type: Function,
+      required: true
+    }
+  },
+  components: {
+    RemoveButton: RemoveButton,
+    TextField: TextField,
+    DropdownField: DropdownField,
+    RadioButtonField: RadioButtonField
+  }
+};
+
+var AddItemButton = {
+  render: function render() {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('button', { staticClass: "hxb-field-card hxb-add-item-button", attrs: { "type": "button" }, on: { "click": _vm.addField } }, [_c('span', { staticClass: "hxb-add-item-button__icon" }, [_vm._v("+")])]);
+  },
+  staticRenderFns: [],
+  name: 'add-item-button',
+  methods: _extends({}, mapActions({
+    addField: 'fields/addField'
+  }))
 };
 
 var NewTemplatePage = {
@@ -24094,7 +24068,8 @@ var EditTemplatePageStep2 = {
     editTemplate: function editTemplate(e) {
       var name = void 0,
           field = void 0,
-          idx = void 0;
+          idx = void 0,
+          db = void 0;
       var fields = [];
       var form = this.$store.state.form.fields;
       var self = this;
@@ -24122,16 +24097,13 @@ var EditTemplatePageStep2 = {
         }
       }
 
-      hoodie.ready.then(function () {
-        if (hoodie.account.isSignedIn()) {
-          self.template.templateName = name;
-          self.template.fields = fields;
-          hoodie.store.update(self.template);
-          // redirect to the home page when finished
-          self.$router.push('/app/home');
-        } else {
-          throw new Error('User is not currently signed in.');
-        }
+      db = lib.get();
+      db.pleaseUpdate(self.template).then(function (resp) {
+        console.log(resp);
+        // redirect to the home page when finished
+        self.$router.push('/app/home');
+      }).catch(function (error) {
+        console.log(error);
       });
     },
     removeField: function removeField(fieldIndex) {
@@ -24139,18 +24111,18 @@ var EditTemplatePageStep2 = {
       this.$store.dispatch('fields/removeField', fieldIndex);
     },
     deleteTemplate: function deleteTemplate(e) {
+      var db = void 0;
       var self = this;
 
       e.preventDefault();
 
-      hoodie.ready.then(function () {
-        if (hoodie.account.isSignedIn()) {
-          hoodie.store.remove(self.template.id);
-          // redirect to the home page when finished
-          self.$router.push('/app/home');
-        } else {
-          throw new Error('User is not currently signed in.');
-        }
+      db = lib.get();
+      db.pleaseRemove(self.template.id).then(function (resp) {
+        console.log(resp);
+        // redirect to the home page when finished
+        self.$router.push('/app/home');
+      }).catch(function (error) {
+        console.log(error);
       });
     }
   },
@@ -24186,18 +24158,18 @@ var ItemPage = {
   })),
   methods: {
     deleteItem: function deleteItem(e) {
+      var db = void 0;
       var self = this;
 
       e.preventDefault();
 
-      hoodie.ready.then(function () {
-        if (hoodie.account.isSignedIn()) {
-          hoodie.store.remove(self.item.id);
-          // redirect to the home page when finished
-          self.$router.push('/app/home');
-        } else {
-          throw new Error('User is not currently signed in.');
-        }
+      db = lib.get();
+      db.pleaseRemove(self.item.id).then(function (resp) {
+        console.log(resp);
+        // redirect to the home page when finished
+        self.$router.push('/app/home');
+      }).catch(function (error) {
+        console.log(error);
       });
     }
   },
@@ -24254,6 +24226,7 @@ var EditItemPage = {
     },
     editItem: function editItem(e) {
       var i = void 0,
+          db = void 0,
           field = void 0;
       var self = this;
       var form = this.$store.state.form.fields;
@@ -24270,14 +24243,13 @@ var EditItemPage = {
         }
       }
 
-      hoodie.ready.then(function () {
-        if (hoodie.account.isSignedIn()) {
-          hoodie.store.update(self.item);
-          // redirect to the home page when finished
-          self.$router.push('/app/home');
-        } else {
-          throw new Error('User is not currently signed in.');
-        }
+      db = lib.get();
+      db.pleaseUpdate(self.item).then(function (resp) {
+        console.log(resp);
+        // redirect to the home page when finished
+        self.$router.push('/app/home');
+      }).catch(function (error) {
+        console.log(error);
       });
     }
   },

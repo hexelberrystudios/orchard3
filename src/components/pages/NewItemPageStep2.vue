@@ -20,6 +20,7 @@
   import AppHeader from '../AppHeader.vue'
   import SubmitButton from '../SubmitButton.vue'
   import FieldMorpher from '../fields/edit/FieldMorpher.vue'
+  import DB from '../../db/db'
   
   // @TODO: Get this to work without javascript,
   // and get this to work with reloading the page
@@ -34,6 +35,7 @@
     methods: {
       addItem: function (e) {
         let i,
+          db,
           templateField;
         let self = this;
         let form = this.$store.state.form.fields;
@@ -60,15 +62,15 @@
         }
         item.templateName = this.template.templateName
         
-        hoodie.ready.then(function () {
-          if (hoodie.account.isSignedIn()) {
-            hoodie.store.add(item);
+        db = DB.get()
+        db.pleaseAdd(item)
+          .then(function (resp) {
+            console.log(resp);
             // redirect to the home page when finished
             self.$router.push('/app/home');
-          } else {
-            throw new Error('User is not currently signed in.');
-          }
-        });
+          }).catch(function (error) {
+            console.log(error)
+          })
       }
     },
     components: {
