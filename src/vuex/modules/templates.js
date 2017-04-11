@@ -41,7 +41,7 @@ const templateModule = {
           })
       }
       
-      return null
+      return new Promise(findAllTemplates)
     },
     getTemplate: ({ commit, state }, id) => {
       const findTemplate = function (resolve, reject) {
@@ -59,7 +59,7 @@ const templateModule = {
           })
       }
       
-      return null
+      return new Promise(findTemplate)
     },
     setTemplate: ({ commit, state }, template) => {
       commit('ACTIVE_TEMPLATE', template)

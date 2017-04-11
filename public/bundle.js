@@ -5,16 +5,6 @@ var global$1 = typeof global !== "undefined" ? global :
             typeof self !== "undefined" ? self :
             typeof window !== "undefined" ? window : {};
 
-/*!
- * Vue.js v2.2.6
- * (c) 2014-2017 Evan You
- * Released under the MIT License.
- */
-/*  */
-
-/**
- * Convert a value to a string that is actually rendered.
- */
 function _toString (val) {
   return val == null
     ? ''
@@ -5333,8 +5323,6 @@ var klass = {
 
 /*  */
 
-// in some cases, the event used has to be determined at runtime
-// so we used some reserved tokens during compile.
 var RANGE_TOKEN = '__r';
 var CHECKBOX_RADIO_TOKEN = '__c';
 
@@ -7774,7 +7762,6 @@ function immediate(task) {
   }
 }
 
-/* istanbul ignore next */
 function INTERNAL() {}
 
 var handlers = {};
@@ -8042,9 +8029,6 @@ function argsArray(fun) {
     }
   };
 }
-
-// shim for using process in browser
-// based off https://github.com/defunctzombie/node-process/blob/master/browser.js
 
 function defaultSetTimout() {
     throw new Error('setTimeout has not been defined');
@@ -10055,11 +10039,6 @@ var sparkMd5 = createCommonjsModule(function (module, exports) {
 }));
 });
 
-/**
- * Stringify/parse functions that don't operate
- * recursively, so they avoid call stack exceeded
- * errors.
- */
 var stringify = function stringify(input) {
   var queue = [];
   queue.push({obj: input});
@@ -10232,7 +10211,6 @@ var index$5 = {
 	parse: parse$1
 };
 
-/* istanbul ignore next */
 var PouchPromise$1 = typeof Promise === 'function' ? Promise : browser$1;
 
 function isBinaryObject(object) {
@@ -21627,6 +21605,10 @@ PouchDB$5.plugin(IDBPouch)
   .plugin(mapreduce)
   .plugin(replication);
 
+// Pull from src because pouchdb-node/pouchdb-browser themselves
+// are aggressively optimized and jsnext:main would normally give us this
+// aggressive bundle.
+
 if (typeof Object.assign !== 'function') {
   // lite Object.assign polyfill based on
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
@@ -21652,10 +21634,6 @@ if (typeof Object.assign !== 'function') {
 
 var assign$1 = Object.assign;
 
-// Unique ID creation requires a high quality random # generator.  In the
-// browser this is a little complicated due to unknown quality of Math.random()
-// and inconsistent support for the `crypto` API.  We do the best we can via
-// feature-detection
 var rng;
 
 var crypto = commonjsGlobal.crypto || commonjsGlobal.msCrypto; // for IE 11
@@ -21710,18 +21688,6 @@ function bytesToUuid(buf, offset) {
 
 var bytesToUuid_1 = bytesToUuid;
 
-// Unique ID creation requires a high quality random # generator.  We feature
-// detect to determine the best RNG source, normalizing to a function that
-// returns 128-bits of randomness, since that's what's usually required
-
-
-
-// **`v1()` - Generate time-based UUID**
-//
-// Inspired by https://github.com/LiosK/UUID.js
-// and http://docs.python.org/library/uuid.html
-
-// random #'s we need to init node and clockseq
 var _seedBytes = rngBrowser();
 
 // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
@@ -21911,14 +21877,6 @@ var _extends = Object.assign || function (target) {
   return target;
 };
 
-/**
- * Adds one object to the local database.
- *
- * @param  {PouchDB}  {REQUIRED} db       Reference to PouchDB
- * @param  {Object}   {REQUIRED} doc      The object to be added to the db
- * @param  {String}   {OPTIONAL} prefix   optional id prefix
- * @return {Promise}
- */
 function addOne(db, doc, prefix) {
   if ((typeof doc === 'undefined' ? 'undefined' : _typeof(doc)) !== 'object') {
     return Promise.reject('Document must be a JSON object');
@@ -21939,7 +21897,7 @@ function addOne(db, doc, prefix) {
 
   // add createdAt/updatedAt timestamps
   doc = addTimestamps(doc);
-  return db.put().then(function (response) {
+  return db.put(doc).then(function (response) {
     // make sure to include the latest id and revision information
     doc._id = response.id;
     doc._rev = response.rev;
@@ -21960,14 +21918,6 @@ function addOne(db, doc, prefix) {
   });
 }
 
-/**
- * Adds one object to the local database.
- *
- * @param  {PouchDB}  {REQUIRED} db       Reference to PouchDB
- * @param  {Array}    {REQUIRED} docs     The object to be added to the db
- * @param  {String}   {OPTIONAL} prefix   optional id prefix
- * @return {Promise}
- */
 function addMany(db, docs, prefix) {
   // copy over the objects to be added and add timestamps to them
   docs = docs.map(function (doc) {
@@ -22007,14 +21957,6 @@ function addMany(db, docs, prefix) {
   });
 }
 
-/**
- * Adds one or multiple objects to the local database.
- *
- * @param  {PouchDB}      {REQUIRED} db       Reference to PouchDB
- * @param  {Object|Array} {REQUIRED} objects  The object or objects to be added to the db
- * @param  {String}       {OPTIONAL} prefix   optional id prefix
- * @return {Promise}
- */
 function add$1$1(objects, prefix) {
   var db = this;
 
@@ -22037,14 +21979,6 @@ function isntDesignDoc(row) {
   return row.id.match(/^_design/) === null;
 }
 
-/**
- * Finds all existing objects in local database.
- *
- * @param  {Function} {OPTIONAL} filter   Function returning `true` for any object
- *                                        to be returned.
- * @param  {String}   {OPTIONAL} prefix   optional id prefix
- * @return {Promise}
- */
 function findAll(filter, prefix) {
   var db = this;
 
@@ -22070,14 +22004,6 @@ function idOrObjectToId(idOrObject) {
   return (typeof idOrObject === 'undefined' ? 'undefined' : _typeof(idOrObject)) === 'object' ? idOrObject._id : idOrObject;
 }
 
-/**
- * Returns the object matching the given id or object.
- *
- * @param  {PouchDB}       {REQUIRED} db         Reference to PouchDB
- * @param  {String|Object} {REQUIRED} idOrObject An array of ids or objects
- * @param  {String}        {OPTIONAL} prefix     optional id prefix
- * @return {Promise}
- */
 function findOne(db, idOrObject, prefix) {
   var id = idOrObjectToId(idOrObject);
 
@@ -22100,14 +22026,6 @@ function findOne(db, idOrObject, prefix) {
   });
 }
 
-/**
- * Returns all objects matching the given ids or objects.
- *
- * @param  {PouchDB}  {REQUIRED} db           Reference to PouchDB
- * @param  {Array}    {REQUIRED} idsOrObjects An array of ids or objects
- * @param  {String}   {OPTIONAL} prefix       optional id prefix
- * @return {Promise}
- */
 function findMany(db, idsOrObjects, prefix) {
   var ids = idsOrObjects.map(idOrObjectToId);
 
@@ -22118,7 +22036,7 @@ function findMany(db, idsOrObjects, prefix) {
     });
   }
 
-  return state.db.allDocs({ keys: ids, include_docs: true }).then(function (response) {
+  return db.allDocs({ keys: ids, include_docs: true }).then(function (response) {
     // gather a hashmap of ids
     var docsById = response.rows.reduce(function (map, row) {
       map[row.id] = row.doc;
@@ -22128,6 +22046,7 @@ function findMany(db, idsOrObjects, prefix) {
     // for each requested id, use foundMap to get the document with the matching id
     var docs = ids.map(function (id) {
       var doc = docsById[id];
+
       if (doc) {
         return doc;
       } else {
@@ -22144,27 +22063,12 @@ function findMany(db, idsOrObjects, prefix) {
   });
 }
 
-/**
- * finds existing object in local database
- *
- * @param  {Array}   {REQUIRED} idsOrObjects An array of ids or objects
- * @param  {String}  {OPTIONAL} prefix       Optional id prefix
- * @return {Promise}
- */
 function find(idsOrObjects, prefix) {
   var db = this;
 
   return Array.isArray(idsOrObjects) ? findMany(db, idsOrObjects, prefix) : findOne(db, idsOrObjects, prefix);
 }
 
-/**
- * Removes existing object
- *
- * @param  {PouchDB}  {REQUIRED} db     Reference to PouchDB
- * @param  {Function} {REQUIRED} filter Function returning `true` for any doc to be removed.
- * @param  {String}   {OPTIONAL} prefix Optional id prefix
- * @return {Promise}
- */
 function removeAll(filter, prefix) {
   var docs = void 0;
   var db = this;
@@ -22198,11 +22102,6 @@ function removeAll(filter, prefix) {
   });
 }
 
-/**
-  * Change object either by passing changed properties
-  * as an object, or by passing a change function that
-  * manipulates the passed object directly.
-  **/
 function changeObject$1(change, object) {
   if ((typeof change === 'undefined' ? 'undefined' : _typeof(change)) === 'object') {
     assign$1(object, change);
@@ -22213,15 +22112,6 @@ function changeObject$1(change, object) {
   return object;
 }
 
-/**
- * Update one object to the local database.
- *
- * @param  {PouchDB}         {REQUIRED} db         Reference to PouchDB
- * @param  {String|Object}   {REQUIRED} idOrObject An id or object
- * @param  {Function|Object} {REQUIRED} change     Changed properties or function that alters passed doc
- * @param  {String}          {OPTIONAL} prefix     Optional id prefix
- * @return {Promise}
- */
 function updateOne(db, idOrDoc, change, prefix) {
   var doc = void 0;
 
@@ -22244,15 +22134,6 @@ function updateOne(db, idOrDoc, change, prefix) {
   });
 }
 
-/**
- * Update one object to the local database.
- *
- * @param  {PouchDB}         {REQUIRED} db           Reference to PouchDB
- * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
- * @param  {Function|Object} {REQUIRED} change       Changed properties or function that alters passed doc
- * @param  {String}          {OPTIONAL} prefix       Optional id prefix
- * @return {Promise}
- */
 function updateMany(db, idsOrObjects, change, prefix) {
   var docs = void 0;
   var ids = idsOrObjects.map(function (doc) {
@@ -22309,12 +22190,6 @@ function updateMany(db, idsOrObjects, change, prefix) {
   });
 }
 
-/**
- * Normalizes objectOrId, applies changes if any, and mark as deleted
- * 
- * @param  {Function|Object} {REQUIRED} change     Changed properties or function that alters passed doc
- * @param  {String|Object}   {REQUIRED} idOrObject An id or object
- */
 function markAsDeleted(change, idOrObject) {
   var object = typeof idOrObject === 'string' ? { _id: idOrObject } : idOrObject;
 
@@ -22325,28 +22200,12 @@ function markAsDeleted(change, idOrObject) {
   return assign$1({ _deleted: true }, object);
 }
 
-/**
- * Removes existing object
- *
- * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
- * @param  {Object|Function} {OPTIONAL} change       Change properties or function that changes existing object
- * @param  {String}          {OPTIONAL} prefix       Optional id prefix
- * @return {Promise}
- */
 function remove$1$1(idsOrObjects, change, prefix) {
   var db = this;
 
   return Array.isArray(idsOrObjects) ? updateMany(db, idsOrObjects.map(markAsDeleted.bind(null, change)), null, prefix) : updateOne(db, markAsDeleted(change, idsOrObjects), null, prefix);
 }
 
-/**
- * Updates existing object.
- * 
- * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
- * @param  {Function|Object} {OPTIONAL} change       Changed properties or function that alters passed doc
- * @param  {String}          {OPTIONAL} prefix       Optional id prefix
- * @return {Promise}
- */
 function update$1(idsOrObjects, change, prefix) {
   var db = this;
 
@@ -22357,10 +22216,6 @@ function update$1(idsOrObjects, change, prefix) {
   return Array.isArray(idsOrObjects) ? updateMany(db, idsOrObjects, change, prefix) : updateOne(db, idsOrObjects, change, prefix);
 }
 
-/**
- * This is a thin wrapper over the PouchDB API to automatically
- * handle id and timestamps.
- */
 var pleaseInit = function pleaseInit() {
   var api = {
     pleaseAdd: add$1$1,
@@ -22484,7 +22339,7 @@ var templateModule = {
         });
       };
 
-      return null;
+      return new Promise(findAllTemplates);
     },
     getTemplate: function getTemplate(_ref2, id) {
       var commit = _ref2.commit,
@@ -22503,7 +22358,7 @@ var templateModule = {
         });
       };
 
-      return null;
+      return new Promise(findTemplate);
     },
     setTemplate: function setTemplate(_ref3, template) {
       var commit = _ref3.commit,
@@ -22562,7 +22417,7 @@ var itemModule = {
         });
       };
 
-      return null;
+      return new Promise(findAllItems);
     },
     getItem: function getItem(_ref2, id) {
       var commit = _ref2.commit,
@@ -22581,7 +22436,7 @@ var itemModule = {
         });
       };
 
-      return null;
+      return new Promise(findItem);
     },
     getToDoItems: function getToDoItems(_ref3) {
       var commit = _ref3.commit,
@@ -22674,7 +22529,7 @@ var itemModule = {
         });
       };
 
-      return null;
+      return new Promise(findAllToDoItems);
     },
     setItem: function setItem(_ref4, item) {
       var commit = _ref4.commit,
@@ -22695,7 +22550,7 @@ var defaultState = {
 var inBrowser$1 = typeof window !== 'undefined';
 
 // if in browser, use pre-fetched state injected by SSR
-var state$1 = inBrowser$1 && window.__INITIAL_STATE__ || defaultState;
+var state = inBrowser$1 && window.__INITIAL_STATE__ || defaultState;
 
 var mutations = {
   TOPICS_LIST: function TOPICS_LIST(state, topics) {
@@ -22712,7 +22567,7 @@ var mutations = {
 };
 
 var store = new index_esm.Store({
-  state: state$1,
+  state: state,
   actions: actions,
   mutations: mutations,
   getters: getters,
@@ -22725,15 +22580,6 @@ var store = new index_esm.Store({
 });
 
 var __dirname = '/home/ubuntu/workspace/src/router';
-
-/*
- * This is a text field. It can be of type text, email, password, etc.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this text field.
- * @param {STRING} {REQUIRED} label       The label for this text field.
- * @param {STRING} {OPTIONAL} type        The type of input field this will be. (text, password, email, etc.)
- * @param {STRING} {OPTIONAL} placeholder The placeholder attribute for this text field.
- */
 
 var TextField = {
   render: function render() {
@@ -23054,11 +22900,6 @@ var DisplayTimeSinceField = {
   }
 };
 
-/**
- * This component will morph into the given field.
- * NOTE: Remember to update this component with all relevant properties from possible fields,
- * so the properties can be properly bound.
- */
 var DisplayFieldMorpher = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('Display' + _vm.field.fieldType, { tag: "component", attrs: { "value": _vm.field.value } });
@@ -23104,14 +22945,6 @@ var DisplayItem = {
     }
   }
 };
-
-/**
- * Shows a list of items and bundles for the current bundle directory.
- *
- * @TODO: Replace items with data pulled from DB.
- *
- * @param {STRING} {REQUIRED} path The bundle path to display.
- */
 
 var fetchInitialData = function fetchInitialData(store) {
   return store.dispatch('items/getItems');
@@ -23370,15 +23203,6 @@ var TextAreaField = {
   }
 };
 
-/*
- * This is a date field.
- * 
- * @TODO: Add datepicker.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this date field.
- * @param {STRING} {REQUIRED} label       The label for this date field.
- */
-
 var DateField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": "date", "name": _vm.id, "placeholder": "yyyy-mm-dd" }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
@@ -23411,15 +23235,6 @@ var DateField = {
     }
   }
 };
-
-/*
- * This is a time field.
- * 
- * @TODO: Add time picker, figure out time zones.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this field.
- * @param {STRING} {REQUIRED} label       The label for this field.
- */
 
 var TimeField = {
   render: function render() {
@@ -23507,16 +23322,6 @@ var CompletableField = {
   }
 };
 
-/*
- * This is a time since field. This shows the amount of time that has elapsed
- * since the time has been reset.
- * 
- * @TODO: Add datepicker.
- *
- * @param {STRING} {REQUIRED} id          The id and name of this date field.
- * @param {STRING} {REQUIRED} label       The label for this date field.
- */
-
 var TimeSinceField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('span', { staticClass: "hxb-u-display-block" }, [_vm._v(_vm._s(_vm.value))]), _vm._v(" "), _c('button', { staticClass: "hxb-button", attrs: { "type": "button" }, on: { "click": _vm.resetTime } }, [_vm._v("Reset")])]);
@@ -23595,11 +23400,6 @@ var TimeSinceField = {
   }
 };
 
-/**
- * This component will morph into the given field.
- * NOTE: Remember to update this component with all relevant properties from possible fields,
- * so the properties can be properly bound.
- */
 var FieldMorpher = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.field.fieldType, { tag: "component", attrs: { "id": _vm.fieldId, "label": _vm.field.fieldLabel } });
@@ -23625,9 +23425,6 @@ var FieldMorpher = {
     TimeSinceField: TimeSinceField
   }
 };
-
-// @TODO: Get this to work without javascript,
-// and get this to work with reloading the page
 
 var NewItemPageStep2 = {
   render: function render() {
@@ -23702,9 +23499,6 @@ var RemoveButton = {
   }
 };
 
-/*
- * options {ARRAY} - [{ label: 'string', value: 'string' }, ...]
- */
 var RadioButtonField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('fieldset', { staticClass: "hxb-fieldset" }, [_c('legend', [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _vm._l(_vm.options, function (option, index) {

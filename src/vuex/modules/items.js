@@ -41,7 +41,7 @@ const itemModule = {
           })
       }
               
-      return null
+      return new Promise(findAllItems)
     },
     getItem: ({ commit, state }, id) => {
       const findItem = function (resolve, reject) {
@@ -59,7 +59,7 @@ const itemModule = {
           })
       }
       
-      return null
+      return new Promise(findItem)
     },
     getToDoItems: ({ commit, state }) => {
       const findAllToDoItems = function (resolve, reject) {
@@ -151,7 +151,7 @@ const itemModule = {
           })
       }
       
-      return null
+      return new Promise(findAllToDoItems)
     },
     setItem: ({ commit, state }, item) => {
       commit('ACTIVE_ITEM', item)

@@ -18,7 +18,7 @@ function findMany (db, idsOrObjects, prefix) {
     })
   }
 
-  return state.db.allDocs({keys: ids, include_docs: true})
+  return db.allDocs({ keys: ids, include_docs: true })
     .then(function (response) {
       // gather a hashmap of ids
       const docsById = response.rows.reduce(function (map, row) {
@@ -29,6 +29,7 @@ function findMany (db, idsOrObjects, prefix) {
       // for each requested id, use foundMap to get the document with the matching id
       const docs = ids.map(function (id) {
         const doc = docsById[id]
+        
         if (doc) {
           return doc
         } else {

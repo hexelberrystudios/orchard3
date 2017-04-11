@@ -15,13 +15,12 @@
   "homepage": "https://github.com/hexelberrystudios/orchard3#readme",
   "scripts": {
     "start": "node server",
-    "startLocal": "PORT=8000 node server",
+    "dev:client": "rollup --config ./build/rollup.client.config.js -w",
+    "dev:server": "rollup --config ./build/rollup.server.config.js -w",
+    "dev": "npm run dev:client && npm run dev:server",
     "build:client": "rollup --config ./build/rollup.client.config.js",
     "build:server": "rollup --config ./build/rollup.server.config.js",
-    "build": "npm run build:client && npm run build:server",
-    "dev:client": "rollup --config ./build/rollup.client.config.js --watch",
-    "dev:server": "rollup --config ./build/rollup.server.config.js --watch",
-    "dev": "npm run dev:client && npm run dev:server"
+    "build": "npm run build:client && npm run build:server"
   },
   "dependencies": {
     "babel-core": "^6.24.0",
@@ -30,8 +29,9 @@
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
     "pouchdb": "^6.1.2",
+    "pouchdb-errors": "^6.1.2",
+    "pouchdb-utils": "^6.1.2",
     "serve-static": "^1.12.1",
-    "uuid": "^3.0.1",
     "vue": "^2.2.5",
     "vue-router": "^2.3.0",
     "vue-server-renderer": "^2.2.5",
@@ -44,14 +44,11 @@
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-livereload": "^0.4.0",
-    "rollup-plugin-node-builtins": "^2.1.0",
-    "rollup-plugin-node-globals": "^1.1.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-scss": "^0.2.0",
     "rollup-plugin-serve": "^0.1.0",
     "rollup-plugin-uglify": "^1.0.1",
-    "rollup-plugin-vue2": "^0.8.0",
-    "rollup-watch": "^3.2.2"
+    "rollup-plugin-vue2": "^0.8.0"
   }
 }
