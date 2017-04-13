@@ -26,13 +26,16 @@ const fieldListModule = {
       } else {
         throw new Error('fieldIndex undefined in fields/removeField');
       }
+    },
+    RESET_FIELDS: (state) => {
+      state.fields = [{ active: true }];
     }
   },
   // update the store event handler
   actions: {
-    addField ({ commit }, field) { commit('ADD_FIELD', field) },
-    updateField ({ commit }, field) { commit('UPDATE_FIELD', field) },
-    removeField ({ commit }, fieldIndex) { commit('REMOVE_FIELD', fieldIndex) }
+    addField ({ commit }) { commit('ADD_FIELD') },
+    removeField ({ commit }, fieldIndex) { commit('REMOVE_FIELD', fieldIndex) },
+    resetFields ({ commit }) { commit('RESET_FIELDS') }
   }
 }
 

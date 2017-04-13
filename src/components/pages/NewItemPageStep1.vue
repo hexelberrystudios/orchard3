@@ -45,10 +45,11 @@
           template = templates[i]
           templateList.push({
             label: template.templateName,
-            value: template.id
+            value: template._id
           })
         }
 
+        console.log(templateList)
         return templateList
       }
     },
@@ -70,7 +71,7 @@
         e.preventDefault()
         
         for (i = 0; i < this.templates.length; i++) {
-          if (this.templates[i].id === templateId) {
+          if (this.templates[i]._id === templateId) {
             template = this.templates[i]
             break
           }

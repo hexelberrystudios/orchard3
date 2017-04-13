@@ -5,6 +5,16 @@ var global$1 = typeof global !== "undefined" ? global :
             typeof self !== "undefined" ? self :
             typeof window !== "undefined" ? window : {};
 
+/*!
+ * Vue.js v2.2.6
+ * (c) 2014-2017 Evan You
+ * Released under the MIT License.
+ */
+/*  */
+
+/**
+ * Convert a value to a string that is actually rendered.
+ */
 function _toString (val) {
   return val == null
     ? ''
@@ -5323,6 +5333,8 @@ var klass = {
 
 /*  */
 
+// in some cases, the event used has to be determined at runtime
+// so we used some reserved tokens during compile.
 var RANGE_TOKEN = '__r';
 var CHECKBOX_RADIO_TOKEN = '__c';
 
@@ -7664,21 +7676,24 @@ var fieldListModule = {
       } else {
         throw new Error('fieldIndex undefined in fields/removeField');
       }
+    },
+    RESET_FIELDS: function RESET_FIELDS(state) {
+      state.fields = [{ active: true }];
     }
   },
   // update the store event handler
   actions: {
-    addField: function addField(_ref, field) {
+    addField: function addField(_ref) {
       var commit = _ref.commit;
-      commit('ADD_FIELD', field);
+      commit('ADD_FIELD');
     },
-    updateField: function updateField(_ref2, field) {
+    removeField: function removeField(_ref2, fieldIndex) {
       var commit = _ref2.commit;
-      commit('UPDATE_FIELD', field);
-    },
-    removeField: function removeField(_ref3, fieldIndex) {
-      var commit = _ref3.commit;
       commit('REMOVE_FIELD', fieldIndex);
+    },
+    resetFields: function resetFields(_ref3) {
+      var commit = _ref3.commit;
+      commit('RESET_FIELDS');
     }
   }
 };
@@ -7762,6 +7777,7 @@ function immediate(task) {
   }
 }
 
+/* istanbul ignore next */
 function INTERNAL() {}
 
 var handlers = {};
@@ -8029,6 +8045,9 @@ function argsArray(fun) {
     }
   };
 }
+
+// shim for using process in browser
+// based off https://github.com/defunctzombie/node-process/blob/master/browser.js
 
 function defaultSetTimout() {
     throw new Error('setTimeout has not been defined');
@@ -10039,6 +10058,11 @@ var sparkMd5 = createCommonjsModule(function (module, exports) {
 }));
 });
 
+/**
+ * Stringify/parse functions that don't operate
+ * recursively, so they avoid call stack exceeded
+ * errors.
+ */
 var stringify = function stringify(input) {
   var queue = [];
   queue.push({obj: input});
@@ -10211,6 +10235,7 @@ var index$5 = {
 	parse: parse$1
 };
 
+/* istanbul ignore next */
 var PouchPromise$1 = typeof Promise === 'function' ? Promise : browser$1;
 
 function isBinaryObject(object) {
@@ -21605,10 +21630,6 @@ PouchDB$5.plugin(IDBPouch)
   .plugin(mapreduce)
   .plugin(replication);
 
-// Pull from src because pouchdb-node/pouchdb-browser themselves
-// are aggressively optimized and jsnext:main would normally give us this
-// aggressive bundle.
-
 if (typeof Object.assign !== 'function') {
   // lite Object.assign polyfill based on
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
@@ -21634,6 +21655,10 @@ if (typeof Object.assign !== 'function') {
 
 var assign$1 = Object.assign;
 
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
 var rng;
 
 var crypto = commonjsGlobal.crypto || commonjsGlobal.msCrypto; // for IE 11
@@ -21688,6 +21713,18 @@ function bytesToUuid(buf, offset) {
 
 var bytesToUuid_1 = bytesToUuid;
 
+// Unique ID creation requires a high quality random # generator.  We feature
+// detect to determine the best RNG source, normalizing to a function that
+// returns 128-bits of randomness, since that's what's usually required
+
+
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+// random #'s we need to init node and clockseq
 var _seedBytes = rngBrowser();
 
 // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
@@ -21877,6 +21914,14 @@ var _extends = Object.assign || function (target) {
   return target;
 };
 
+/**
+ * Adds one object to the local database.
+ *
+ * @param  {PouchDB}  {REQUIRED} db       Reference to PouchDB
+ * @param  {Object}   {REQUIRED} doc      The object to be added to the db
+ * @param  {String}   {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
 function addOne(db, doc, prefix) {
   if ((typeof doc === 'undefined' ? 'undefined' : _typeof(doc)) !== 'object') {
     return Promise.reject('Document must be a JSON object');
@@ -21918,6 +21963,14 @@ function addOne(db, doc, prefix) {
   });
 }
 
+/**
+ * Adds one object to the local database.
+ *
+ * @param  {PouchDB}  {REQUIRED} db       Reference to PouchDB
+ * @param  {Array}    {REQUIRED} docs     The object to be added to the db
+ * @param  {String}   {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
 function addMany(db, docs, prefix) {
   // copy over the objects to be added and add timestamps to them
   docs = docs.map(function (doc) {
@@ -21957,6 +22010,14 @@ function addMany(db, docs, prefix) {
   });
 }
 
+/**
+ * Adds one or multiple objects to the local database.
+ *
+ * @param  {PouchDB}      {REQUIRED} db       Reference to PouchDB
+ * @param  {Object|Array} {REQUIRED} objects  The object or objects to be added to the db
+ * @param  {String}       {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
 function add$1$1(objects, prefix) {
   var db = this;
 
@@ -21979,6 +22040,14 @@ function isntDesignDoc(row) {
   return row.id.match(/^_design/) === null;
 }
 
+/**
+ * Finds all existing objects in local database.
+ *
+ * @param  {Function} {OPTIONAL} filter   Function returning `true` for any object
+ *                                        to be returned.
+ * @param  {String}   {OPTIONAL} prefix   optional id prefix
+ * @return {Promise}
+ */
 function findAll(filter, prefix) {
   var db = this;
 
@@ -22004,6 +22073,14 @@ function idOrObjectToId(idOrObject) {
   return (typeof idOrObject === 'undefined' ? 'undefined' : _typeof(idOrObject)) === 'object' ? idOrObject._id : idOrObject;
 }
 
+/**
+ * Returns the object matching the given id or object.
+ *
+ * @param  {PouchDB}       {REQUIRED} db         Reference to PouchDB
+ * @param  {String|Object} {REQUIRED} idOrObject An array of ids or objects
+ * @param  {String}        {OPTIONAL} prefix     optional id prefix
+ * @return {Promise}
+ */
 function findOne(db, idOrObject, prefix) {
   var id = idOrObjectToId(idOrObject);
 
@@ -22026,6 +22103,14 @@ function findOne(db, idOrObject, prefix) {
   });
 }
 
+/**
+ * Returns all objects matching the given ids or objects.
+ *
+ * @param  {PouchDB}  {REQUIRED} db           Reference to PouchDB
+ * @param  {Array}    {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {String}   {OPTIONAL} prefix       optional id prefix
+ * @return {Promise}
+ */
 function findMany(db, idsOrObjects, prefix) {
   var ids = idsOrObjects.map(idOrObjectToId);
 
@@ -22063,12 +22148,27 @@ function findMany(db, idsOrObjects, prefix) {
   });
 }
 
+/**
+ * finds existing object in local database
+ *
+ * @param  {Array}   {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {String}  {OPTIONAL} prefix       Optional id prefix
+ * @return {Promise}
+ */
 function find(idsOrObjects, prefix) {
   var db = this;
 
   return Array.isArray(idsOrObjects) ? findMany(db, idsOrObjects, prefix) : findOne(db, idsOrObjects, prefix);
 }
 
+/**
+ * Removes existing object
+ *
+ * @param  {PouchDB}  {REQUIRED} db     Reference to PouchDB
+ * @param  {Function} {REQUIRED} filter Function returning `true` for any doc to be removed.
+ * @param  {String}   {OPTIONAL} prefix Optional id prefix
+ * @return {Promise}
+ */
 function removeAll(filter, prefix) {
   var docs = void 0;
   var db = this;
@@ -22102,6 +22202,11 @@ function removeAll(filter, prefix) {
   });
 }
 
+/**
+  * Change object either by passing changed properties
+  * as an object, or by passing a change function that
+  * manipulates the passed object directly.
+  **/
 function changeObject$1(change, object) {
   if ((typeof change === 'undefined' ? 'undefined' : _typeof(change)) === 'object') {
     assign$1(object, change);
@@ -22112,6 +22217,15 @@ function changeObject$1(change, object) {
   return object;
 }
 
+/**
+ * Update one object to the local database.
+ *
+ * @param  {PouchDB}         {REQUIRED} db         Reference to PouchDB
+ * @param  {String|Object}   {REQUIRED} idOrObject An id or object
+ * @param  {Function|Object} {REQUIRED} change     Changed properties or function that alters passed doc
+ * @param  {String}          {OPTIONAL} prefix     Optional id prefix
+ * @return {Promise}
+ */
 function updateOne(db, idOrDoc, change, prefix) {
   var doc = void 0;
 
@@ -22134,6 +22248,15 @@ function updateOne(db, idOrDoc, change, prefix) {
   });
 }
 
+/**
+ * Update one object to the local database.
+ *
+ * @param  {PouchDB}         {REQUIRED} db           Reference to PouchDB
+ * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {Function|Object} {REQUIRED} change       Changed properties or function that alters passed doc
+ * @param  {String}          {OPTIONAL} prefix       Optional id prefix
+ * @return {Promise}
+ */
 function updateMany(db, idsOrObjects, change, prefix) {
   var docs = void 0;
   var ids = idsOrObjects.map(function (doc) {
@@ -22190,6 +22313,12 @@ function updateMany(db, idsOrObjects, change, prefix) {
   });
 }
 
+/**
+ * Normalizes objectOrId, applies changes if any, and mark as deleted
+ * 
+ * @param  {Function|Object} {REQUIRED} change     Changed properties or function that alters passed doc
+ * @param  {String|Object}   {REQUIRED} idOrObject An id or object
+ */
 function markAsDeleted(change, idOrObject) {
   var object = typeof idOrObject === 'string' ? { _id: idOrObject } : idOrObject;
 
@@ -22200,12 +22329,28 @@ function markAsDeleted(change, idOrObject) {
   return assign$1({ _deleted: true }, object);
 }
 
+/**
+ * Removes existing object
+ *
+ * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {Object|Function} {OPTIONAL} change       Change properties or function that changes existing object
+ * @param  {String}          {OPTIONAL} prefix       Optional id prefix
+ * @return {Promise}
+ */
 function remove$1$1(idsOrObjects, change, prefix) {
   var db = this;
 
   return Array.isArray(idsOrObjects) ? updateMany(db, idsOrObjects.map(markAsDeleted.bind(null, change)), null, prefix) : updateOne(db, markAsDeleted(change, idsOrObjects), null, prefix);
 }
 
+/**
+ * Updates existing object.
+ * 
+ * @param  {Array}           {REQUIRED} idsOrObjects An array of ids or objects
+ * @param  {Function|Object} {OPTIONAL} change       Changed properties or function that alters passed doc
+ * @param  {String}          {OPTIONAL} prefix       Optional id prefix
+ * @return {Promise}
+ */
 function update$1(idsOrObjects, change, prefix) {
   var db = this;
 
@@ -22216,6 +22361,10 @@ function update$1(idsOrObjects, change, prefix) {
   return Array.isArray(idsOrObjects) ? updateMany(db, idsOrObjects, change, prefix) : updateOne(db, idsOrObjects, change, prefix);
 }
 
+/**
+ * This is a thin wrapper over the PouchDB API to automatically
+ * handle id and timestamps.
+ */
 var pleaseInit = function pleaseInit() {
   var api = {
     pleaseAdd: add$1$1,
@@ -22581,6 +22730,15 @@ var store = new index_esm.Store({
 
 var __dirname = '/home/ubuntu/workspace/src/router';
 
+/*
+ * This is a text field. It can be of type text, email, password, etc.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this text field.
+ * @param {STRING} {REQUIRED} label       The label for this text field.
+ * @param {STRING} {OPTIONAL} type        The type of input field this will be. (text, password, email, etc.)
+ * @param {STRING} {OPTIONAL} placeholder The placeholder attribute for this text field.
+ */
+
 var TextField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": _vm.type, "name": _vm.id, "placeholder": _vm.placeholder }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
@@ -22900,6 +23058,11 @@ var DisplayTimeSinceField = {
   }
 };
 
+/**
+ * This component will morph into the given field.
+ * NOTE: Remember to update this component with all relevant properties from possible fields,
+ * so the properties can be properly bound.
+ */
 var DisplayFieldMorpher = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('Display' + _vm.field.fieldType, { tag: "component", attrs: { "value": _vm.field.value } });
@@ -22924,7 +23087,7 @@ var DisplayFieldMorpher = {
 
 var DisplayItem = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('section', { staticClass: "hxb-object-list-item" }, [_c('router-link', { staticClass: "hxb-object-list-item__link", attrs: { "to": _vm.itemPath + _vm.item.id } }, [_vm._l(_vm.item.fields, function (field) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('section', { staticClass: "hxb-object-list-item" }, [_c('router-link', { staticClass: "hxb-object-list-item__link", attrs: { "to": _vm.itemPath + _vm.item._id } }, [_vm._l(_vm.item.fields, function (field) {
       return field.showInPreview === 'yes' ? [_c('display-field-morpher', { attrs: { "field": field } })] : _vm._e();
     })], 2)], 1);
   },
@@ -22945,6 +23108,14 @@ var DisplayItem = {
     }
   }
 };
+
+/**
+ * Shows a list of items and bundles for the current bundle directory.
+ *
+ * @TODO: Replace items with data pulled from DB.
+ *
+ * @param {STRING} {REQUIRED} path The bundle path to display.
+ */
 
 var fetchInitialData = function fetchInitialData(store) {
   return store.dispatch('items/getItems');
@@ -23051,13 +23222,7 @@ var NewPage = {
  */
 var DropdownField = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { directives: [{ name: "model", rawName: "v-model", value: _vm.value, expression: "value" }], staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": [function ($event) {
-          var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-            return o.selected;
-          }).map(function (o) {
-            var val = "_value" in o ? o._value : o.value;return val;
-          });_vm.value = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
-        }, _vm.update] } }, _vm._l(_vm.options, function (option) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": _vm.update } }, _vm._l(_vm.options, function (option) {
       return _c('option', { domProps: { "value": option.value } }, [_vm._v(_vm._s(option.label))]);
     }))]);
   },
@@ -23077,6 +23242,7 @@ var DropdownField = {
   },
   computed: _extends({}, mapState({
     value: function value(state) {
+      console.log('DROPDOWN: ' + state.form.fields[this.id] || '');
       return state.form.fields[this.id] || '';
     }
   })),
@@ -23123,10 +23289,11 @@ var NewItemPageStep1 = {
         template = templates[i];
         templateList.push({
           label: template.templateName,
-          value: template.id
+          value: template._id
         });
       }
 
+      console.log(templateList);
       return templateList;
     }
   }),
@@ -23149,7 +23316,7 @@ var NewItemPageStep1 = {
       e.preventDefault();
 
       for (i = 0; i < this.templates.length; i++) {
-        if (this.templates[i].id === templateId) {
+        if (this.templates[i]._id === templateId) {
           template = this.templates[i];
           break;
         }
@@ -23203,6 +23370,15 @@ var TextAreaField = {
   }
 };
 
+/*
+ * This is a date field.
+ * 
+ * @TODO: Add datepicker.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this date field.
+ * @param {STRING} {REQUIRED} label       The label for this date field.
+ */
+
 var DateField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('input', { staticClass: "hxb-input-field hxb-u-border hxb-gray-border-color", attrs: { "id": _vm.id, "type": "date", "name": _vm.id, "placeholder": "yyyy-mm-dd" }, domProps: { "value": _vm.value }, on: { "input": _vm.update } })]);
@@ -23235,6 +23411,15 @@ var DateField = {
     }
   }
 };
+
+/*
+ * This is a time field.
+ * 
+ * @TODO: Add time picker, figure out time zones.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this field.
+ * @param {STRING} {REQUIRED} label       The label for this field.
+ */
 
 var TimeField = {
   render: function render() {
@@ -23322,6 +23507,16 @@ var CompletableField = {
   }
 };
 
+/*
+ * This is a time since field. This shows the amount of time that has elapsed
+ * since the time has been reset.
+ * 
+ * @TODO: Add datepicker.
+ *
+ * @param {STRING} {REQUIRED} id          The id and name of this date field.
+ * @param {STRING} {REQUIRED} label       The label for this date field.
+ */
+
 var TimeSinceField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('span', { staticClass: "hxb-u-display-block" }, [_vm._v(_vm._s(_vm.value))]), _vm._v(" "), _c('button', { staticClass: "hxb-button", attrs: { "type": "button" }, on: { "click": _vm.resetTime } }, [_vm._v("Reset")])]);
@@ -23400,6 +23595,11 @@ var TimeSinceField = {
   }
 };
 
+/**
+ * This component will morph into the given field.
+ * NOTE: Remember to update this component with all relevant properties from possible fields,
+ * so the properties can be properly bound.
+ */
 var FieldMorpher = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.field.fieldType, { tag: "component", attrs: { "id": _vm.fieldId, "label": _vm.field.fieldLabel } });
@@ -23425,6 +23625,9 @@ var FieldMorpher = {
     TimeSinceField: TimeSinceField
   }
 };
+
+// @TODO: Get this to work without javascript,
+// and get this to work with reloading the page
 
 var NewItemPageStep2 = {
   render: function render() {
@@ -23499,6 +23702,9 @@ var RemoveButton = {
   }
 };
 
+/*
+ * options {ARRAY} - [{ label: 'string', value: 'string' }, ...]
+ */
 var RadioButtonField = {
   render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('fieldset', { staticClass: "hxb-fieldset" }, [_c('legend', [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _vm._l(_vm.options, function (option, index) {
@@ -23755,7 +23961,7 @@ var EditTemplatePageStep1 = {
         template = templates[i];
         templateList.push({
           label: template.templateName,
-          value: template.id
+          value: template._id
         });
       }
 
@@ -23786,7 +23992,7 @@ var EditTemplatePageStep1 = {
       e.preventDefault();
 
       for (i = 0; i < this.templates.length; i++) {
-        if (this.templates[i].id === templateId) {
+        if (this.templates[i]._id === templateId) {
           template = this.templates[i];
           break;
         }
@@ -23806,7 +24012,7 @@ var EditTemplatePageStep1 = {
 
 var EditTemplatePageStep2 = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("You're editing your " + _vm._s(_vm.template.templateName) + " template:")]), _vm._v(" "), _c('div', { staticClass: "hxb-u-pd-1" }, [_c('form', { attrs: { "name": "delete_template", "method": "DELETE", "action": '/app/template/' + _vm.template.id }, on: { "submit": _vm.deleteTemplate } }, [_c('input', { attrs: { "type": "hidden", "name": "templateId" }, domProps: { "value": _vm.template.id } }), _vm._v(" "), _c('submit-button', { attrs: { "text": "Delete" } })], 1)]), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "edit-template", "method": "POST", "action": "/app/edit-template" }, on: { "submit": _vm.editTemplate } }, [_c('text-field', { attrs: { "id": "name", "label": "Name" } }), _vm._v(" "), _vm._l(_vm.fields, function (field, index) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("You're editing your " + _vm._s(_vm.template.templateName) + " template:")]), _vm._v(" "), _c('div', { staticClass: "hxb-u-pd-1" }, [_c('form', { attrs: { "name": "delete_template", "method": "DELETE", "action": '/app/template/' + _vm.template._id }, on: { "submit": _vm.deleteTemplate } }, [_c('input', { attrs: { "type": "hidden", "name": "templateId" }, domProps: { "value": _vm.template._id } }), _vm._v(" "), _c('submit-button', { attrs: { "text": "Delete" } })], 1)]), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "edit-template", "method": "POST", "action": "/app/edit-template" }, on: { "submit": _vm.editTemplate } }, [_c('text-field', { attrs: { "id": "name", "label": "Name" } }), _vm._v(" "), _vm._l(_vm.fields, function (field, index) {
       return [field.active ? _c('field-card', { attrs: { "fieldIndex": index, "removeField": _vm.removeField } }) : _vm._e()];
     }), _vm._v(" "), _c('add-item-button'), _vm._v(" "), _c('div', { staticClass: "hxb-form-field" }, [_c('submit-button', { attrs: { "text": "Save" } })], 1)], 2), _vm._v(" "), _c('app-footer')], 1);
   },
@@ -23814,6 +24020,7 @@ var EditTemplatePageStep2 = {
   name: 'edit-template-page-2',
   created: function created() {
     this.$store.dispatch('form/resetForm');
+    this.$store.dispatch('fields/resetFields');
   },
 
   mounted: function mounted() {
@@ -23891,6 +24098,9 @@ var EditTemplatePageStep2 = {
         }
       }
 
+      self.template.templateName = name;
+      self.template.fields = fields;
+
       db = lib.get();
       db.pleaseUpdate(self.template).then(function (resp) {
         console.log(resp);
@@ -23911,7 +24121,7 @@ var EditTemplatePageStep2 = {
       e.preventDefault();
 
       db = lib.get();
-      db.pleaseRemove(self.template.id).then(function (resp) {
+      db.pleaseRemove(self.template._id).then(function (resp) {
         console.log(resp);
         // redirect to the home page when finished
         self.$router.push('/app/home');
@@ -23958,7 +24168,7 @@ var ItemPage = {
       e.preventDefault();
 
       db = lib.get();
-      db.pleaseRemove(self.item.id).then(function (resp) {
+      db.pleaseRemove(self.item._id).then(function (resp) {
         console.log(resp);
         // redirect to the home page when finished
         self.$router.push('/app/home');
@@ -23977,7 +24187,7 @@ var ItemPage = {
 
 var EditItemPage = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('article', { staticClass: "hxb-u-pd-1" }, [_c('router-link', { attrs: { "to": _vm.itemPath + _vm.item.id } }, [_vm._v("Back")]), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "edit_item", "method": "POST", "action": "/app/edit-item" }, on: { "submit": _vm.editItem } }, [_vm._l(_vm.item.fields, function (field, index) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('article', { staticClass: "hxb-u-pd-1" }, [_c('router-link', { attrs: { "to": _vm.itemPath + _vm.item._id } }, [_vm._v("Back")]), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "edit_item", "method": "POST", "action": "/app/edit-item" }, on: { "submit": _vm.editItem } }, [_vm._l(_vm.item.fields, function (field, index) {
       return [_c('field-morpher', { attrs: { "field": field, "fieldId": 'field_' + index } })];
     }), _vm._v(" "), _c('div', { staticClass: "hxb-form-field" }, [_c('submit-button', { attrs: { "text": "Save" } })], 1)], 2)], 1), _vm._v(" "), _c('app-footer')], 1);
   },

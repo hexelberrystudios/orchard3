@@ -50,7 +50,7 @@
         e.preventDefault();
         
         db = DB.get();
-        db.pleaseRemove(self.item.id)
+        db.pleaseRemove(self.item._id)
           .then(function (resp) {
             console.log(resp);
             // redirect to the home page when finished

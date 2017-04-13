@@ -2,7 +2,7 @@
   <div>
     <app-header></app-header>
     <article class="hxb-u-pd-1">
-      <router-link :to="itemPath + item.id">Back</router-link>
+      <router-link :to="itemPath + item._id">Back</router-link>
       <form v-on:submit="editItem" name="edit_item" method="POST" action="/app/edit-item" class="hxb-form">
         <template v-for="(field, index) in item.fields">
           <field-morpher :field="field" :fieldId="'field_' + index"></field-morpher>

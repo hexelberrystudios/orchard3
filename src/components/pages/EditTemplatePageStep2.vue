@@ -3,8 +3,8 @@
     <app-header></app-header>
     <h1 class="hxb-u-pdl-1">You're editing your {{ template.templateName }} template:</h1>
     <div class="hxb-u-pd-1">
-      <form v-on:submit="deleteTemplate" name="delete_template" method="DELETE" :action="'/app/template/' + template.id">
-        <input type="hidden" name="templateId" :value="template.id" />
+      <form v-on:submit="deleteTemplate" name="delete_template" method="DELETE" :action="'/app/template/' + template._id">
+        <input type="hidden" name="templateId" :value="template._id" />
         <submit-button text="Delete"></submit-button>
       </form>
     </div>
@@ -36,6 +36,7 @@
     name: 'edit-template-page-2',
     created () {
       this.$store.dispatch('form/resetForm')
+      this.$store.dispatch('fields/resetFields')
     },
     mounted: function () {
       this.loadForm()
@@ -114,6 +115,9 @@
           }
         }
         
+        self.template.templateName = name;
+        self.template.fields = fields;
+        
         db = DB.get()
         db.pleaseUpdate(self.template)
           .then(function (resp) {
@@ -135,7 +139,7 @@
         e.preventDefault();
         
         db = DB.get()
-        db.pleaseRemove(self.template.id)
+        db.pleaseRemove(self.template._id)
           .then(function (resp) {
             console.log(resp);
             // redirect to the home page when finished

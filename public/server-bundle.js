@@ -7676,21 +7676,24 @@ var fieldListModule = {
       } else {
         throw new Error('fieldIndex undefined in fields/removeField');
       }
+    },
+    RESET_FIELDS: function RESET_FIELDS(state) {
+      state.fields = [{ active: true }];
     }
   },
   // update the store event handler
   actions: {
-    addField: function addField(_ref, field) {
+    addField: function addField(_ref) {
       var commit = _ref.commit;
-      commit('ADD_FIELD', field);
+      commit('ADD_FIELD');
     },
-    updateField: function updateField(_ref2, field) {
+    removeField: function removeField(_ref2, fieldIndex) {
       var commit = _ref2.commit;
-      commit('UPDATE_FIELD', field);
-    },
-    removeField: function removeField(_ref3, fieldIndex) {
-      var commit = _ref3.commit;
       commit('REMOVE_FIELD', fieldIndex);
+    },
+    resetFields: function resetFields(_ref3) {
+      var commit = _ref3.commit;
+      commit('RESET_FIELDS');
     }
   }
 };
@@ -21939,7 +21942,7 @@ function addOne(db, doc, prefix) {
 
   // add createdAt/updatedAt timestamps
   doc = addTimestamps(doc);
-  return db.put().then(function (response) {
+  return db.put(doc).then(function (response) {
     // make sure to include the latest id and revision information
     doc._id = response.id;
     doc._rev = response.rev;
@@ -22118,7 +22121,7 @@ function findMany(db, idsOrObjects, prefix) {
     });
   }
 
-  return state.db.allDocs({ keys: ids, include_docs: true }).then(function (response) {
+  return db.allDocs({ keys: ids, include_docs: true }).then(function (response) {
     // gather a hashmap of ids
     var docsById = response.rows.reduce(function (map, row) {
       map[row.id] = row.doc;
@@ -22128,6 +22131,7 @@ function findMany(db, idsOrObjects, prefix) {
     // for each requested id, use foundMap to get the document with the matching id
     var docs = ids.map(function (id) {
       var doc = docsById[id];
+
       if (doc) {
         return doc;
       } else {
@@ -22484,7 +22488,7 @@ var templateModule = {
         });
       };
 
-      return null;
+      return new Promise(findAllTemplates);
     },
     getTemplate: function getTemplate(_ref2, id) {
       var commit = _ref2.commit,
@@ -22503,7 +22507,7 @@ var templateModule = {
         });
       };
 
-      return null;
+      return new Promise(findTemplate);
     },
     setTemplate: function setTemplate(_ref3, template) {
       var commit = _ref3.commit,
@@ -22562,7 +22566,7 @@ var itemModule = {
         });
       };
 
-      return null;
+      return new Promise(findAllItems);
     },
     getItem: function getItem(_ref2, id) {
       var commit = _ref2.commit,
@@ -22581,7 +22585,7 @@ var itemModule = {
         });
       };
 
-      return null;
+      return new Promise(findItem);
     },
     getToDoItems: function getToDoItems(_ref3) {
       var commit = _ref3.commit,
@@ -22674,7 +22678,7 @@ var itemModule = {
         });
       };
 
-      return null;
+      return new Promise(findAllToDoItems);
     },
     setItem: function setItem(_ref4, item) {
       var commit = _ref4.commit,
@@ -22695,7 +22699,7 @@ var defaultState = {
 var inBrowser$1 = typeof window !== 'undefined';
 
 // if in browser, use pre-fetched state injected by SSR
-var state$1 = inBrowser$1 && window.__INITIAL_STATE__ || defaultState;
+var state = inBrowser$1 && window.__INITIAL_STATE__ || defaultState;
 
 var mutations = {
   TOPICS_LIST: function TOPICS_LIST(state, topics) {
@@ -22712,7 +22716,7 @@ var mutations = {
 };
 
 var store = new index_esm.Store({
-  state: state$1,
+  state: state,
   actions: actions,
   mutations: mutations,
   getters: getters,
@@ -23083,7 +23087,7 @@ var DisplayFieldMorpher = {
 
 var DisplayItem = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('section', { staticClass: "hxb-object-list-item" }, [_c('router-link', { staticClass: "hxb-object-list-item__link", attrs: { "to": _vm.itemPath + _vm.item.id } }, [_vm._l(_vm.item.fields, function (field) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('section', { staticClass: "hxb-object-list-item" }, [_c('router-link', { staticClass: "hxb-object-list-item__link", attrs: { "to": _vm.itemPath + _vm.item._id } }, [_vm._l(_vm.item.fields, function (field) {
       return field.showInPreview === 'yes' ? [_c('display-field-morpher', { attrs: { "field": field } })] : _vm._e();
     })], 2)], 1);
   },
@@ -23218,13 +23222,7 @@ var NewPage = {
  */
 var DropdownField = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { directives: [{ name: "model", rawName: "v-model", value: _vm.value, expression: "value" }], staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": [function ($event) {
-          var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-            return o.selected;
-          }).map(function (o) {
-            var val = "_value" in o ? o._value : o.value;return val;
-          });_vm.value = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
-        }, _vm.update] } }, _vm._l(_vm.options, function (option) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": _vm.update } }, _vm._l(_vm.options, function (option) {
       return _c('option', { domProps: { "value": option.value } }, [_vm._v(_vm._s(option.label))]);
     }))]);
   },
@@ -23244,6 +23242,7 @@ var DropdownField = {
   },
   computed: _extends({}, mapState({
     value: function value(state) {
+      console.log('DROPDOWN: ' + state.form.fields[this.id] || '');
       return state.form.fields[this.id] || '';
     }
   })),
@@ -23290,10 +23289,11 @@ var NewItemPageStep1 = {
         template = templates[i];
         templateList.push({
           label: template.templateName,
-          value: template.id
+          value: template._id
         });
       }
 
+      console.log(templateList);
       return templateList;
     }
   }),
@@ -23316,7 +23316,7 @@ var NewItemPageStep1 = {
       e.preventDefault();
 
       for (i = 0; i < this.templates.length; i++) {
-        if (this.templates[i].id === templateId) {
+        if (this.templates[i]._id === templateId) {
           template = this.templates[i];
           break;
         }
@@ -23961,7 +23961,7 @@ var EditTemplatePageStep1 = {
         template = templates[i];
         templateList.push({
           label: template.templateName,
-          value: template.id
+          value: template._id
         });
       }
 
@@ -23992,7 +23992,7 @@ var EditTemplatePageStep1 = {
       e.preventDefault();
 
       for (i = 0; i < this.templates.length; i++) {
-        if (this.templates[i].id === templateId) {
+        if (this.templates[i]._id === templateId) {
           template = this.templates[i];
           break;
         }
@@ -24012,7 +24012,7 @@ var EditTemplatePageStep1 = {
 
 var EditTemplatePageStep2 = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("You're editing your " + _vm._s(_vm.template.templateName) + " template:")]), _vm._v(" "), _c('div', { staticClass: "hxb-u-pd-1" }, [_c('form', { attrs: { "name": "delete_template", "method": "DELETE", "action": '/app/template/' + _vm.template.id }, on: { "submit": _vm.deleteTemplate } }, [_c('input', { attrs: { "type": "hidden", "name": "templateId" }, domProps: { "value": _vm.template.id } }), _vm._v(" "), _c('submit-button', { attrs: { "text": "Delete" } })], 1)]), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "edit-template", "method": "POST", "action": "/app/edit-template" }, on: { "submit": _vm.editTemplate } }, [_c('text-field', { attrs: { "id": "name", "label": "Name" } }), _vm._v(" "), _vm._l(_vm.fields, function (field, index) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('h1', { staticClass: "hxb-u-pdl-1" }, [_vm._v("You're editing your " + _vm._s(_vm.template.templateName) + " template:")]), _vm._v(" "), _c('div', { staticClass: "hxb-u-pd-1" }, [_c('form', { attrs: { "name": "delete_template", "method": "DELETE", "action": '/app/template/' + _vm.template._id }, on: { "submit": _vm.deleteTemplate } }, [_c('input', { attrs: { "type": "hidden", "name": "templateId" }, domProps: { "value": _vm.template._id } }), _vm._v(" "), _c('submit-button', { attrs: { "text": "Delete" } })], 1)]), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "edit-template", "method": "POST", "action": "/app/edit-template" }, on: { "submit": _vm.editTemplate } }, [_c('text-field', { attrs: { "id": "name", "label": "Name" } }), _vm._v(" "), _vm._l(_vm.fields, function (field, index) {
       return [field.active ? _c('field-card', { attrs: { "fieldIndex": index, "removeField": _vm.removeField } }) : _vm._e()];
     }), _vm._v(" "), _c('add-item-button'), _vm._v(" "), _c('div', { staticClass: "hxb-form-field" }, [_c('submit-button', { attrs: { "text": "Save" } })], 1)], 2), _vm._v(" "), _c('app-footer')], 1);
   },
@@ -24020,6 +24020,7 @@ var EditTemplatePageStep2 = {
   name: 'edit-template-page-2',
   created: function created() {
     this.$store.dispatch('form/resetForm');
+    this.$store.dispatch('fields/resetFields');
   },
 
   mounted: function mounted() {
@@ -24097,6 +24098,9 @@ var EditTemplatePageStep2 = {
         }
       }
 
+      self.template.templateName = name;
+      self.template.fields = fields;
+
       db = lib.get();
       db.pleaseUpdate(self.template).then(function (resp) {
         console.log(resp);
@@ -24117,7 +24121,7 @@ var EditTemplatePageStep2 = {
       e.preventDefault();
 
       db = lib.get();
-      db.pleaseRemove(self.template.id).then(function (resp) {
+      db.pleaseRemove(self.template._id).then(function (resp) {
         console.log(resp);
         // redirect to the home page when finished
         self.$router.push('/app/home');
@@ -24164,7 +24168,7 @@ var ItemPage = {
       e.preventDefault();
 
       db = lib.get();
-      db.pleaseRemove(self.item.id).then(function (resp) {
+      db.pleaseRemove(self.item._id).then(function (resp) {
         console.log(resp);
         // redirect to the home page when finished
         self.$router.push('/app/home');
@@ -24183,7 +24187,7 @@ var ItemPage = {
 
 var EditItemPage = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('article', { staticClass: "hxb-u-pd-1" }, [_c('router-link', { attrs: { "to": _vm.itemPath + _vm.item.id } }, [_vm._v("Back")]), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "edit_item", "method": "POST", "action": "/app/edit-item" }, on: { "submit": _vm.editItem } }, [_vm._l(_vm.item.fields, function (field, index) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('app-header'), _vm._v(" "), _c('article', { staticClass: "hxb-u-pd-1" }, [_c('router-link', { attrs: { "to": _vm.itemPath + _vm.item._id } }, [_vm._v("Back")]), _vm._v(" "), _c('form', { staticClass: "hxb-form", attrs: { "name": "edit_item", "method": "POST", "action": "/app/edit-item" }, on: { "submit": _vm.editItem } }, [_vm._l(_vm.item.fields, function (field, index) {
       return [_c('field-morpher', { attrs: { "field": field, "fieldId": 'field_' + index } })];
     }), _vm._v(" "), _c('div', { staticClass: "hxb-form-field" }, [_c('submit-button', { attrs: { "text": "Save" } })], 1)], 2)], 1), _vm._v(" "), _c('app-footer')], 1);
   },
