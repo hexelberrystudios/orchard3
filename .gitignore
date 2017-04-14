@@ -1,2 +1,8 @@
 node_modules
 npm-debug.log
+public/bundle.css
+public/bundle.js
+public/bundle.js.map
+public/server-bundle.css
+public/server-bundle.js
+public/server-bundle.js.map
