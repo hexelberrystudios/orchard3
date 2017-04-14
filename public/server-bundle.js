@@ -22473,19 +22473,25 @@ var templateModule = {
 
       var findAllTemplates = function findAllTemplates(resolve, reject) {
         var db = lib.get();
-        // look through the DB for all the templates
-        db.pleaseFindAll(function (doc) {
-          return doc.templateName && !doc.isItem;
-        }).then(function (templateDocs) {
-          console.log('done loading templates');
-          console.log(templateDocs);
-          // update the store with the list of available templates
-          commit('TEMPLATE_LIST', templateDocs);
-          resolve(templateDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+
+        if (db) {
+          // look through the DB for all the templates
+          db.pleaseFindAll(function (doc) {
+            return doc.templateName && !doc.isItem;
+          }).then(function (templateDocs) {
+            console.log('done loading templates');
+            console.log(templateDocs);
+            // update the store with the list of available templates
+            commit('TEMPLATE_LIST', templateDocs);
+            resolve(templateDocs);
+          }).catch(function (error) {
+            console.log(error);
+            reject(error);
+          });
+        } else {
+          commit('TEMPLATE_LIST', []);
+          resolve([]);
+        }
       };
 
       return new Promise(findAllTemplates);
@@ -22496,15 +22502,21 @@ var templateModule = {
 
       var findTemplate = function findTemplate(resolve, reject) {
         var db = lib.get();
-        // look through the DB for all the items
-        db.pleaseFind(id).then(function (templateDoc) {
-          // update the store with the list of available items
-          commit('ACTIVE_TEMPLATE', templateDoc);
-          resolve(templateDoc);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+
+        if (db) {
+          // look through the DB for all the items
+          db.pleaseFind(id).then(function (templateDoc) {
+            // update the store with the list of available items
+            commit('ACTIVE_TEMPLATE', templateDoc);
+            resolve(templateDoc);
+          }).catch(function (error) {
+            console.log(error);
+            reject(error);
+          });
+        } else {
+          commit('ACTIVE_TEMPLATE', {});
+          resolve({});
+        }
       };
 
       return new Promise(findTemplate);
@@ -22551,19 +22563,25 @@ var itemModule = {
 
       var findAllItems = function findAllItems(resolve, reject) {
         var db = lib.get();
-        // look through the DB for all the items
-        db.pleaseFindAll(function (doc) {
-          return doc.isItem;
-        }).then(function (itemDocs) {
-          console.log('ITEMS FOUND:');
-          console.log(itemDocs);
-          // update the store with the list of available items
-          commit('ITEM_LIST', itemDocs);
-          resolve(itemDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+
+        if (db) {
+          // look through the DB for all the items
+          db.pleaseFindAll(function (doc) {
+            return doc.isItem;
+          }).then(function (itemDocs) {
+            console.log('ITEMS FOUND:');
+            console.log(itemDocs);
+            // update the store with the list of available items
+            commit('ITEM_LIST', itemDocs);
+            resolve(itemDocs);
+          }).catch(function (error) {
+            console.log(error);
+            reject(error);
+          });
+        } else {
+          commit('ITEM_LIST', []);
+          resolve([]);
+        }
       };
 
       return new Promise(findAllItems);
@@ -22574,15 +22592,21 @@ var itemModule = {
 
       var findItem = function findItem(resolve, reject) {
         var db = lib.get();
-        // look through the DB for all the items
-        db.pleaseFind(id).then(function (itemDoc) {
-          // update the store with the list of available items
-          commit('ACTIVE_ITEM', itemDoc);
-          resolve(itemDoc);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+
+        if (db) {
+          // look through the DB for all the items
+          db.pleaseFind(id).then(function (itemDoc) {
+            // update the store with the list of available items
+            commit('ACTIVE_ITEM', itemDoc);
+            resolve(itemDoc);
+          }).catch(function (error) {
+            console.log(error);
+            reject(error);
+          });
+        } else {
+          commit('ACTIVE_ITEM', {});
+          resolve({});
+        }
       };
 
       return new Promise(findItem);
@@ -22593,89 +22617,95 @@ var itemModule = {
 
       var findAllToDoItems = function findAllToDoItems(resolve, reject) {
         var db = lib.get();
-        // look through the DB for all the items
-        db.pleaseFindAll(function (field) {
-          return field.fieldType === 'CompletableField';
-        }).then(function (itemDocs) {
-          console.log('TO DO ITEMS FOUND:');
-          console.log(itemDocs);
 
-          // @TODO: Refactor into configurable system
-          // Sort items date desc
-          itemDocs.sort(function (itemA, itemB) {
-            var dateA = void 0,
-                dateB = void 0,
-                date = void 0,
-                time = void 0;
+        if (db) {
+          // look through the DB for all the items
+          db.pleaseFindAll(function (field) {
+            return field.fieldType === 'CompletableField';
+          }).then(function (itemDocs) {
+            console.log('TO DO ITEMS FOUND:');
+            console.log(itemDocs);
 
-            // get all relevant fields that have been filled out
-            var dateFieldsA = itemA.fields.filter(function (field) {
-              return field.fieldType === 'DateField' && field.value;
+            // @TODO: Refactor into configurable system
+            // Sort items date desc
+            itemDocs.sort(function (itemA, itemB) {
+              var dateA = void 0,
+                  dateB = void 0,
+                  date = void 0,
+                  time = void 0;
+
+              // get all relevant fields that have been filled out
+              var dateFieldsA = itemA.fields.filter(function (field) {
+                return field.fieldType === 'DateField' && field.value;
+              });
+              var dateFieldsB = itemB.fields.filter(function (field) {
+                return field.fieldType === 'DateField' && field.value;
+              });
+              var timeFieldsA = itemA.fields.filter(function (field) {
+                return field.fieldType === 'TimeField' && field.value;
+              });
+              var timeFieldsB = itemB.fields.filter(function (field) {
+                return field.fieldType === 'TimeField' && field.value;
+              });
+
+              // we're going to sort by the first date and time field we find,
+              // because how else are we going to do that
+              if (dateFieldsA.length || timeFieldsA.length) {
+                dateA = new Date();
+              }
+              if (dateFieldsA.length) {
+                date = dateFieldsA[0].value.split('-');
+                dateA.setYear(date[0]);
+                dateA.setMonth(date[1]);
+                dateA.setDate(date[2]);
+              }
+              if (timeFieldsA.length) {
+                time = timeFieldsA[0].value.split(':');
+                dateA.setHours(time[0]);
+                dateA.setMinutes(time[1]);
+              }
+
+              if (dateFieldsB.length || timeFieldsB.length) {
+                dateB = new Date();
+              }
+              if (dateFieldsB.length) {
+                date = dateFieldsB[0].value.split('-');
+                dateB.setYear(date[0]);
+                dateB.setMonth(date[1]);
+                dateB.setDate(date[2]);
+              }
+              if (timeFieldsB.length) {
+                time = timeFieldsB[0].value.split(':');
+                dateB.setHours(time[0]);
+                dateB.setMinutes(time[1]);
+              }
+
+              // sort by date desc
+              if (dateA && dateB) {
+                return dateB.getTime() - dateA.getTime();
+              } else if (dateA) {
+                // A < B
+                return -1;
+              } else if (dateB) {
+                // A > B
+                return 1;
+              } else {
+                // Neither have dates, so they're equal
+                return 0;
+              }
             });
-            var dateFieldsB = itemB.fields.filter(function (field) {
-              return field.fieldType === 'DateField' && field.value;
-            });
-            var timeFieldsA = itemA.fields.filter(function (field) {
-              return field.fieldType === 'TimeField' && field.value;
-            });
-            var timeFieldsB = itemB.fields.filter(function (field) {
-              return field.fieldType === 'TimeField' && field.value;
-            });
 
-            // we're going to sort by the first date and time field we find,
-            // because how else are we going to do that
-            if (dateFieldsA.length || timeFieldsA.length) {
-              dateA = new Date();
-            }
-            if (dateFieldsA.length) {
-              date = dateFieldsA[0].value.split('-');
-              dateA.setYear(date[0]);
-              dateA.setMonth(date[1]);
-              dateA.setDate(date[2]);
-            }
-            if (timeFieldsA.length) {
-              time = timeFieldsA[0].value.split(':');
-              dateA.setHours(time[0]);
-              dateA.setMinutes(time[1]);
-            }
-
-            if (dateFieldsB.length || timeFieldsB.length) {
-              dateB = new Date();
-            }
-            if (dateFieldsB.length) {
-              date = dateFieldsB[0].value.split('-');
-              dateB.setYear(date[0]);
-              dateB.setMonth(date[1]);
-              dateB.setDate(date[2]);
-            }
-            if (timeFieldsB.length) {
-              time = timeFieldsB[0].value.split(':');
-              dateB.setHours(time[0]);
-              dateB.setMinutes(time[1]);
-            }
-
-            // sort by date desc
-            if (dateA && dateB) {
-              return dateB.getTime() - dateA.getTime();
-            } else if (dateA) {
-              // A < B
-              return -1;
-            } else if (dateB) {
-              // A > B
-              return 1;
-            } else {
-              // Neither have dates, so they're equal
-              return 0;
-            }
+            // update the store with the list of available items
+            commit('ITEM_LIST', itemDocs);
+            resolve(itemDocs);
+          }).catch(function (error) {
+            console.log(error);
+            reject(error);
           });
-
-          // update the store with the list of available items
-          commit('ITEM_LIST', itemDocs);
-          resolve(itemDocs);
-        }).catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        } else {
+          commit('ITEM_LIST', []);
+          resolve([]);
+        }
       };
 
       return new Promise(findAllToDoItems);
@@ -23222,7 +23252,13 @@ var NewPage = {
  */
 var DropdownField = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": _vm.update } }, _vm._l(_vm.options, function (option) {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "hxb-form-field" }, [_c('label', { staticClass: "hxb-u-display-block", attrs: { "for": _vm.id } }, [_vm._v(_vm._s(_vm.label))]), _vm._v(" "), _c('select', { directives: [{ name: "model", rawName: "v-model", value: _vm.value, expression: "value" }], staticClass: "hxb-dropdown", attrs: { "id": _vm.id }, on: { "change": [function ($event) {
+          var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+            return o.selected;
+          }).map(function (o) {
+            var val = "_value" in o ? o._value : o.value;return val;
+          });_vm.value = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+        }, _vm.update] } }, _vm._l(_vm.options, function (option) {
       return _c('option', { domProps: { "value": option.value } }, [_vm._v(_vm._s(option.label))]);
     }))]);
   },
@@ -23242,7 +23278,6 @@ var DropdownField = {
   },
   computed: _extends({}, mapState({
     value: function value(state) {
-      console.log('DROPDOWN: ' + state.form.fields[this.id] || '');
       return state.form.fields[this.id] || '';
     }
   })),

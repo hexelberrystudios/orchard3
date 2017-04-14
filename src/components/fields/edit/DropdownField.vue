@@ -2,7 +2,7 @@
   <div class="hxb-form-field">
     <label :for="id"
            class="hxb-u-display-block">{{ label }}</label>
-    <select :id="id" class="hxb-dropdown" v-on:change="update">
+    <select :id="id" class="hxb-dropdown" v-on:change="update" v-model="value">
       <option v-for="option in options" :value="option.value">{{ option.label }}</option>
     </select>
   </div>
@@ -36,7 +36,6 @@
       // get the latest value of this form field from the vuex store
       ...mapState({
         value: function (state) {
-          console.log('DROPDOWN: ' + state.form.fields[this.id] || '')
           return state.form.fields[this.id] || '';
         }
       })

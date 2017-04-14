@@ -26,19 +26,25 @@ const templateModule = {
     getTemplates: ({ commit, state }) => {
       const findAllTemplates = function (resolve, reject) {
         let db = DB.get()
-        // look through the DB for all the templates
-        db.pleaseFindAll((doc) => doc.templateName && !doc.isItem)
-          .then((templateDocs) => {
-            console.log('done loading templates')
-            console.log(templateDocs)
-            // update the store with the list of available templates
-            commit('TEMPLATE_LIST', templateDocs)
-            resolve(templateDocs)
-          })
-          .catch((error) => {
-            console.log(error)
-            reject(error)
-          })
+        
+        if (db) {
+          // look through the DB for all the templates
+          db.pleaseFindAll((doc) => doc.templateName && !doc.isItem)
+            .then((templateDocs) => {
+              console.log('done loading templates')
+              console.log(templateDocs)
+              // update the store with the list of available templates
+              commit('TEMPLATE_LIST', templateDocs)
+              resolve(templateDocs)
+            })
+            .catch((error) => {
+              console.log(error)
+              reject(error)
+            })
+        } else {
+          commit('TEMPLATE_LIST', [])
+          resolve([])
+        }
       }
       
       return new Promise(findAllTemplates)
@@ -46,17 +52,23 @@ const templateModule = {
     getTemplate: ({ commit, state }, id) => {
       const findTemplate = function (resolve, reject) {
         let db = DB.get()
-        // look through the DB for all the items
-        db.pleaseFind(id)
-          .then((templateDoc) => {
-            // update the store with the list of available items
-            commit('ACTIVE_TEMPLATE', templateDoc)
-            resolve(templateDoc)
-          })
-          .catch((error) => {
-            console.log(error)
-            reject(error)
-          })
+        
+        if (db) {
+          // look through the DB for all the items
+          db.pleaseFind(id)
+            .then((templateDoc) => {
+              // update the store with the list of available items
+              commit('ACTIVE_TEMPLATE', templateDoc)
+              resolve(templateDoc)
+            })
+            .catch((error) => {
+              console.log(error)
+              reject(error)
+            })
+        } else {
+          commit('ACTIVE_TEMPLATE', {})
+          resolve({})
+        }
       }
       
       return new Promise(findTemplate)
